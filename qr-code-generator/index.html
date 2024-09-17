@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .left-panel {
+            flex: 3;
+        }
+        .right-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .option {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+        }
+        .option.selected {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #qrcode {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .download-buttons button {
+            flex: 1;
+        }
+        .wifi-hidden-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the element */
+            left: 50%;
+            margin-left: -100px; /* Center the tooltip */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* Arrow at the bottom */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-panel">
+        <div class="options">
+            <div class="option selected" data-type="link">🔗 Link</div>
+            <div class="option" data-type="email">📧 E-mail</div>
+            <div class="option" data-type="text">📄 Text</div>
+            <div class="option" data-type="tel">📞 Call</div>
+            <div class="option" data-type="sms">💬 SMS</div>
+            <div class="option" data-type="whatsapp">📱 WhatsApp</div>
+            <div class="option" data-type="wifi">📶 Wi-Fi</div>
+        </div>
+        <div id="inputFields">
+            <h3>Submit URL</h3>
+            <input type="url" id="url" placeholder="Enter URL">
+        </div>
+        <p id="description">Your QR code will open this URL.</p>
+        <button id="generate">Generate QR Code</button>
+    </div>
+    <div class="right-panel">
+        <div id="qrcode">
+            <!-- Placeholder for a grey dummy QR code -->
+            <img src="https://via.placeholder.com/256x256.png?text=QR+Code" alt="Dummy QR Code">
+        </div>
+        <div class="download-buttons">
+            <button id="downloadPNG" disabled>Download PNG</button>
+            <button id="downloadSVG" disabled>Download SVG</button>
+        </div>
+    </div>
+
+    <script>
+        let qrcode = null;
+        let currentType = 'link';
+        let lastQRCodeData = ''; // To store the last QR code data
+
+        function updateInputFields(type) {
+            const inputFields = document.getElementById('inputFields');
+            const description = document.getElementById('description');
+            let html = '';
+            let descriptionText = '';
+
+            switch(type) {
+                case 'link':
+                    html = `
+                        <h3>Submit URL</h3>
+                        <input type="url" id="url" placeholder="Enter URL">
+                    `;
+                    descriptionText = 'Your QR code will open this URL.';
+                    break;
+                case 'email':
+                    html = `
+                        <h3>E-mail Content</h3>
+                        <input type="email" id="email" placeholder="Email address">
+                        <input type="text" id="subject" placeholder="Subject">
+                        <textarea id="body" placeholder="Email body"></textarea>
+                    `;
+                    descriptionText = 'Scanning the QR code will send this email.';
+                    break;
+                case 'text':
+                    html = `
+                        <h3>Enter Text</h3>
+                        <textarea id="text" placeholder="Enter your text here"></textarea>
+                    `;
+                    descriptionText = 'Your QR code will display this text.';
+                    break;
+                case 'tel':
+                    html = `
+                        <h3>Phone Number</h3>
+                        <input type="tel" id="tel" placeholder="Enter phone number">
+                    `;
+                    descriptionText = 'Scanning the QR code will call this number.';
+                    break;
+                case 'sms':
+                    html = `
+                        <h3>SMS Details</h3>
+                        <input type="tel" id="smsNumber" placeholder="Enter phone number">
+                        <textarea id="smsBody" placeholder="Enter SMS body"></textarea>
+                    `;
+                    descriptionText = 'Scanning the QR code will send a message to this phone number.';
+                    break;
+                case 'whatsapp':
+                    html = `
+                        <h3>WhatsApp Message</h3>
+                        <input type="tel" id="whatsappNumber" placeholder="Enter phone number">
+                        <textarea id="whatsappMessage" placeholder="Enter message"></textarea>
+                    `;
+                    descriptionText = 'Scanning the QR code will send a WhatsApp message to this phone number.';
+                    break;
+                case 'wifi':
+                    html = `
+                        <h3>Wi-Fi Details</h3>
+                        <input type="text" id="wifiSSID" placeholder="SSID (Network Name)">
+                        <input type="password" id="wifiPassword" placeholder="Password">
+                        <select id="wifiEncryption">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">None</option>
+                        </select>
+                        <div class="wifi-hidden-option">
+                            <label>
+                                <input type="checkbox" id="wifiHidden">
+                                Hidden SSID
+                            </label>
+                        </div>
+                    `;
+                    descriptionText = 'Scanning the QR code will connect to the Wi-Fi.';
+                    break;
+                // Add more cases for other types as needed
+            }
+            inputFields.innerHTML = html;
+            description.textContent = descriptionText;
+        }
+
+        function generateQRCode() {
+            const qrcodeElement = document.getElementById('qrcode');
+            qrcodeElement.innerHTML = '';
+            let data = '';
+            switch(currentType) {
+                case 'link':
+                    data = document.getElementById('url').value;
+                    break;
+                case 'email':
+                    const email = document.getElementById('email').value;
+                    const subject = document.getElementById('subject').value;
+                    const body = document.getElementById('body').value;
+                    data = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    break;
+                case 'text':
+                    data = document.getElementById('text').value;
+                    break;
+                case 'tel':
+                    data = `tel:${document.getElementById('tel').value}`;
+                    break;
+               
+                case 'sms':
+                    debugger
+                    const smsNumber = document.getElementById('smsNumber').value;
+                    const smsBody = document.getElementById('smsBody').value;
+                    data = `sms:${smsNumber}?body=${encodeURIComponent(encodeURIComponent(smsBody))}`;
+                    break;
+                case 'whatsapp':
+                    const whatsappNumber = document.getElementById('whatsappNumber').value;
+                    const whatsappMessage = document.getElementById('whatsappMessage').value;
+                    data = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+                    break;
+                case 'wifi':
+                    const ssid = document.getElementById('wifiSSID').value;
+                    const password = document.getElementById('wifiPassword').value;
+                    const encryption = document.getElementById('wifiEncryption').value;
+                    const hidden = document.getElementById('wifiHidden').checked;
+                    data = `WIFI:S:${ssid};T:${encryption};P:${password};`;
+                    if (hidden) {
+                        data += 'H:true;';
+                    }
+                    data += ';';
+                    break;
+                // Add more cases for other types as needed
+            }
+            lastQRCodeData = data; // Store the generated data for SVG creation
+            qrcode = new QRCode(qrcodeElement, {
+                text: data,
+                width: 256,
+                height: 256
+            });
+            // Enable the download buttons
+            document.getElementById('downloadPNG').disabled = false;
+            document.getElementById('downloadSVG').disabled = false;
+        }
+
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelector('.option.selected').classList.remove('selected');
+                this.classList.add('selected');
+                currentType = this.dataset.type;
+                updateInputFields(currentType);
+            });
+        });
+
+        document.getElementById('generate').addEventListener('click', generateQRCode);
+
+        document.getElementById('downloadPNG').addEventListener('click', function() {
+            if (qrcode) {
+                const dataUrl = qrcode._el.querySelector('img').src;
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = dataUrl;
+                link.click();
+            }
+        });
+     
+ function generateSVG(data) {
+  // Create SVG data for the QR code
+  const qrCode = new QRCode(document.createElement('div'), {
+    text: data,
+    width: 256,
+    height: 256
+  });
+
+  // Extract the QR code's modules
+  const canvas = qrCode._el.querySelector('canvas');
+  const size = canvas.width;
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, size, size);
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const index = (y * size + x) * 4;
+      const r = imageData.data[index];
+      const g = imageData.data[index + 1];
+      const b = imageData.data[index + 2];
+
+      // Check if the pixel is black (or very dark)
+      if (r < 50 && g < 50 && b < 50) { 
+        svg += `<rect x="${x}" y="${y}" width="1" height="1" fill="#000" />`;
+      }
+    }
+  }
+  svg += '</svg>';
+  return svg;
+}
+
+document.getElementById('downloadSVG').addEventListener('click', function() {
+    if (lastQRCodeData) {
+        const svgData = generateSVG(lastQRCodeData);
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'qrcode.svg';
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+});
+
+
+        // Initialize with link input fields
+        updateInputFields('link');
+
+        // Show a default grey dummy QR code
+        document.getElementById('qrcode').innerHTML = '<img src="https://via.placeholder.com/256x256.png?text=QR+Code" alt="Dummy QR Code">';
+
+        // Disable the download buttons initially
+        document.getElementById('downloadPNG').disabled = true;
+        document.getElementById('downloadSVG').disabled = true;
+    </script>
+</body>
+</html>
