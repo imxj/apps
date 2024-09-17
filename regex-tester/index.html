@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Tester and Debugger</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+        }
+        .match {
+            background-color: #2ecc71;
+            padding: 2px 4px;
+            border-radius: 2px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Regex Tester and Debugger</h1>
+    <div class="input-group">
+        <label for="regex">Regular Expression:</label>
+        <input type="text" id="regex" placeholder="Enter your regex here">
+    </div>
+    <div class="input-group">
+        <label for="flags">Flags:</label>
+        <input type="text" id="flags" placeholder="Enter flags (e.g., gi)">
+    </div>
+    <div class="input-group">
+        <label for="testString">Test String:</label>
+        <textarea id="testString" placeholder="Enter your test string here"></textarea>
+    </div>
+    <button onclick="testRegex()">Test Regex</button>
+    <div id="result"></div>
+
+    <script>
+        function testRegex() {
+            const regex = document.getElementById('regex').value;
+            const flags = document.getElementById('flags').value;
+            const testString = document.getElementById('testString').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!regex || !testString) {
+                resultDiv.innerHTML = '<p>Please enter both a regex and a test string.</p>';
+                return;
+            }
+
+            try {
+                const re = new RegExp(regex, flags);
+                let match;
+                let output = testString;
+                let lastIndex = 0;
+                const matches = [];
+
+                while ((match = re.exec(testString)) !== null) {
+                    matches.push({index: match.index, length: match[0].length});
+                    if (re.lastIndex === lastIndex) {
+                        break;  // Prevent infinite loop for zero-length matches
+                    }
+                    lastIndex = re.lastIndex;
+                }
+
+                // Apply highlighting from end to start to avoid index issues
+                for (let i = matches.length - 1; i >= 0; i--) {
+                    const {index, length} = matches[i];
+                    output = output.slice(0, index) + '<span class="match">' + output.slice(index, index + length) + '</span>' + output.slice(index + length);
+                }
+
+                resultDiv.innerHTML = `
+                    <p>Matches found: ${matches.length}</p>
+                    <p>Highlighted output:</p>
+                    <pre>${output}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
