@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-RB92YJ3CLH');
     </script>
     <meta charset="UTF-8">
@@ -27,13 +25,20 @@
             text-align: center;
             color: #4CAF50;
         }
+        .row {
+            display: flex;
+            justify-content: space-around; /* Adjusts spacing around each card */
+            margin-bottom: 20px; /* Space between rows */
+        }
         .card {
             background-color: white;
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1 0 30%; /* Flex-grow, Flex-shrink, Flex-basis */
+            box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+            margin: 0 10px; /* Spacing between cards */
         }
         .card h2 {
             margin-top: 0;
@@ -58,30 +63,36 @@
 </head>
 <body>
     <h1>Tools</h1>
+    <div class="row">
         <div class="card">
             <h2>QR Code Generator</h2>
             <p>Supports multiple QR code types including SMS, URL, Wi-Fi, and more.</p>
             <a href="qr-code-generator/index.html" target="_blank">Visit Tool</a>
         </div>
         <div class="card">
-            <h2>Base64 Viewer</h2>
-            <p>Render image for the pasted base64 string.</p>
-            <a href="base64-viewer/index.html" target="_blank">Visit Tool</a>
-        </div>
-        <div class="card">
             <h2>Morgage Calculator</h2>
             <p>Calculate the morgage payment.</p>
             <a href="morgage-calculator/index.html" target="_blank">Visit Tool</a>
         </div>
-        <div class="card">
-            <h2>Regex Tester</h2>
-            <p>Regex Tester and Debugger Online</p>
-            <a href="regex-tester/index.html" target="_blank">Visit Tool</a>
-        </div>
+    </div>
+    <div class="row">
         <div class="card">
             <h2>Timezone Converter</h2>
             <p>Convert local timezone to any timezone in the world</p>
             <a href="timezone-converter/index.html" target="_blank">Visit Tool</a>
         </div>
+        <div class="card">
+            <h2>Base64 Viewer</h2>
+            <p>Render image for the pasted base64 string.</p>
+            <a href="base64-viewer/index.html" target="_blank">Visit Tool</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card">
+            <h2>Regex Tester</h2>
+            <p>Regex Tester and Debugger Online</p>
+            <a href="regex-tester/index.html" target="_blank">Visit Tool</a>
+        </div>
+    </div>
 </body>
 </html>
