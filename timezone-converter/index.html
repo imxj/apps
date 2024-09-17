@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="web, time zone, converter, time, date, free, browser" />
+    <title>Time Zone Converter</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f2f7ff;
+        }
+
+        .container {
+            background-color: #fff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #337ab7;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .button-section {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .time-toggle {
+            border: none;
+            background-color: #337ab7;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .time-toggle:hover {
+            background-color: #285e8e;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            input, select {
+                font-size: 14px;
+            }
+
+            .time-toggle {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Time Zone Converter</h1>
+        <div class="input-section">
+            <input type="time" id="localTime">
+            <input type="date" id="localDate">
+            <select id="localZone">
+                <!-- Local time zone will be dynamically added -->
+            </select>
+        </div>
+
+        <div class="input-section">
+            <input type="text" id="convertedTime" readonly>
+            <input type="date" id="convertedDate" readonly>
+            <select id="convertedZone">
+                <!-- Available time zones will be dynamically loaded here -->
+            </select>
+        </div>
+
+        <div class="button-section">
+            <button class="time-toggle" onclick="toggleTimeFormat()">12 / 24</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.full.min.js"></script>
+    <script>
+        let is24HourFormat = false; // Start with 12-hour format
+
+        // Fetch the local time zone and set current time
+        document.addEventListener('DOMContentLoaded', () => {
+            const localTimeInput = document.getElementById('localTime');
+            const localDateInput = document.getElementById('localDate');
+            const localZoneSelect = document.getElementById('localZone');
+
+            // Set local time and date
+            const now = moment();
+            localTimeInput.value = now.format('HH:mm');
+            localDateInput.value = now.format('YYYY-MM-DD');
+
+            // Set local time zone
+            const localTimeZone = moment.tz.guess();
+            const option = document.createElement('option');
+            option.value = localTimeZone;
+            option.text = `Local Time (${localTimeZone})`;
+            option.selected = true;
+            localZoneSelect.appendChild(option);
+
+            // Load all available time zones
+            loadTimeZones();
+
+            // Set default target time zone to New York
+            setDefaultConvertedZone();
+
+            // Convert time initially
+            convertTime();
+        });
+
+        // Preload all available time zones and make them searchable
+        function loadTimeZones() {
+            const timeZones = moment.tz.names();
+            const localZoneSelect = document.getElementById('localZone');
+            const convertedZoneSelect = document.getElementById('convertedZone');
+
+            timeZones.forEach(timeZone => {
+                const option1 = document.createElement('option');
+                option1.value = timeZone;
+                option1.text = timeZone;
+                localZoneSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = timeZone;
+                option2.text = timeZone;
+                convertedZoneSelect.appendChild(option2);
+            });
+
+            // Initialize Select2 for searchable dropdowns
+            $('#convertedZone').select2({
+                placeholder: "Select a time zone"
+            });
+            $('#localZone').select2({
+                placeholder: "Select a time zone"
+            });
+        }
+
+        // Set the default target time zone to New York
+        function setDefaultConvertedZone() {
+            const convertedZoneSelect = document.getElementById('convertedZone');
+            // Set New York as the default
+            $(convertedZoneSelect).val('America/New_York').trigger('change');
+        }
+
+        // Function to toggle between 12 and 24-hour formats
+        function toggleTimeFormat() {
+            is24HourFormat = !is24HourFormat; // Toggle the flag
+            convertTime(); // Convert time based on the new format
+        }
+
+        // Function to convert time when any input is changed
+        function convertTime() {
+            const localTimeInput = document.getElementById('localTime').value;
+            const localDateInput = document.getElementById('localDate').value;
+            const localZone = document.getElementById('localZone').value;
+            const convertedZone = document.getElementById('convertedZone').value;
+
+            // Construct the local date and time in the local time zone
+            const localDateTime = moment.tz(`${localDateInput} ${localTimeInput}`, "YYYY-MM-DD HH:mm", localZone);
+
+            // Convert to target time zone
+            const convertedDateTime = localDateTime.clone().tz(convertedZone);
+            const formatString = is24HourFormat ? 'HH:mm' : 'hh:mm A'; // Format based on 12/24-hour setting
+            const convertedTimeString = convertedDateTime.format(formatString);
+
+            // Set the converted time and date in the inputs
+            document.getElementById('convertedTime').value = convertedTimeString;
+            document.getElementById('convertedDate').value = convertedDateTime.format('YYYY-MM-DD');
+        }
+
+        // Trigger time conversion when local time, date, or time zone changes
+        document.getElementById('localTime').addEventListener('input', convertTime);
+        document.getElementById('localDate').addEventListener('input', convertTime);
+        $('#localZone').on('change', convertTime); // Use jQuery to handle change event for Select2
+        $('#convertedZone').on('change', convertTime); // Use jQuery to handle change event for Select2
+    </script>
+
+</body>
+</html>
