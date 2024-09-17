@@ -257,10 +257,9 @@
                     break;
                
                 case 'sms':
-                    debugger
                     const smsNumber = document.getElementById('smsNumber').value;
                     const smsBody = document.getElementById('smsBody').value;
-                    data = `sms:${smsNumber}?body=${encodeURIComponent(encodeURIComponent(smsBody))}`;
+                    data = `sms:${smsNumber}&body=${encodeURIComponent(smsBody)}`;
                     break;
                 case 'whatsapp':
                     const whatsappNumber = document.getElementById('whatsappNumber').value;
