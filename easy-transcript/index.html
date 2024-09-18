@@ -149,7 +149,7 @@
             // Audio recording variables
             let audioContext;
             let recorder;
-            let audioBlob;
+            let accumulatedBlobs = []; // Array to store all audio blobs
 
             // Start recognition and recording
             startBtn.addEventListener('click', async () => {
@@ -193,8 +193,10 @@
                     downloadAudioBtn.disabled = false; 
                     transcriptDiv.textContent += ' (Stopped Listening)';
                     // Export audio using Recorder.js
+                    recorder.stop();
                     recorder.exportWAV(blob => {
-                        audioBlob = blob;
+                        accumulatedBlobs.push(blob); // Store the blob in the accumulatedBlobs array
+                        recorder.clear();
                     });
                     // Capture the end timestamp
                     const now = new Date();
@@ -204,30 +206,110 @@
 
             // Download the recorded audio
             downloadAudioBtn.addEventListener('click', () => {
-                if (audioBlob) {
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioPlayer.src = audioUrl;
+                concatenateWavBlobs(accumulatedBlobs).then(concatenatedBlob => {
+                    const audioUrl = URL.createObjectURL(concatenatedBlob);
                     const a = document.createElement('a');
                     a.href = audioUrl;
                     a.download = 'recording.wav';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                } else {
-                    alert('No audio available.');
-                }
+                });
             });
 
             // Play the recorded audio
             playAudioBtn.addEventListener('click', () => {
-                if (audioBlob) {
-                    const audioUrl = URL.createObjectURL(audioBlob);
+                // Combine all blobs into one
+                concatenateWavBlobs(accumulatedBlobs).then(concatenatedBlob => {
+                    const audioUrl = URL.createObjectURL(concatenatedBlob);
                     audioPlayer.src = audioUrl;
                     audioPlayer.play();
-                } else {
-                    alert('No audio available.');
-                }
+                });
             });
+
+            // Concatenate multiple WAV blobs into a single WAV Blob
+        function concatenateWavBlobs(blobs) {
+            return new Promise((resolve, reject) => {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const totalBuffers = [];
+                
+                // Decode all blobs to AudioBuffers
+                const decodePromises = blobs.map(blob => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            audioContext.decodeAudioData(reader.result, resolve, reject);
+                        };
+                        reader.onerror = reject;
+                        reader.readAsArrayBuffer(blob);
+                    });
+                });
+
+                // When all blobs are decoded, concatenate them
+                Promise.all(decodePromises).then(buffers => {
+                    const totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
+                    const outputBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
+                    let offset = 0;
+
+                    buffers.forEach(buffer => {
+                        outputBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
+                        offset += buffer.length;
+                    });
+
+                    // Convert the concatenated buffer to a WAV Blob
+                    const wavBlob = audioBufferToWavBlob(outputBuffer);
+                    resolve(wavBlob);
+                }).catch(reject);
+            });
+        }
+
+        // Convert AudioBuffer to WAV Blob
+        function audioBufferToWavBlob(buffer) {
+            const numberOfChannels = buffer.numberOfChannels;
+            const length = buffer.length * numberOfChannels * 2 + 44;
+            const result = new DataView(new ArrayBuffer(length));
+            const channels = [];
+            let offset = 0;
+            let pos = 0;
+
+            // Write WAV header
+            writeString(result, pos, 'RIFF'); pos += 4;
+            result.setUint32(pos, length - 8, true); pos += 4;
+            writeString(result, pos, 'WAVE'); pos += 4;
+            writeString(result, pos, 'fmt '); pos += 4;
+            result.setUint32(pos, 16, true); pos += 4;
+            result.setUint16(pos, 1, true); pos += 2;
+            result.setUint16(pos, numberOfChannels, true); pos += 2;
+            result.setUint32(pos, buffer.sampleRate, true); pos += 4;
+            result.setUint32(pos, buffer.sampleRate * 4, true); pos += 4;
+            result.setUint16(pos, numberOfChannels * 2, true); pos += 2;
+            result.setUint16(pos, 16, true); pos += 2;
+            writeString(result, pos, 'data'); pos += 4;
+            result.setUint32(pos, length - pos - 4, true); pos += 4;
+
+            // Write interleaved data
+            for (let i = 0; i < buffer.numberOfChannels; i++) {
+                channels.push(buffer.getChannelData(i));
+            }
+            while (pos < length) {
+                for (let i = 0; i < numberOfChannels; i++) {
+                    const sample = Math.max(-1, Math.min(1, channels[i][offset])); // Clamp
+                    result.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                    pos += 2;
+                }
+                offset++;
+            }
+
+            // Create a Blob for the WAV file
+            return new Blob([result], { type: 'audio/wav' });
+        }
+
+        // Utility function to write strings to DataView
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
 
             // Process the results
             recognition.onresult = (event) => {
