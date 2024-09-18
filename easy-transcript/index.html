@@ -66,6 +66,13 @@
             cursor: not-allowed;
         }
 
+        /* Footnote styles */
+        .footnote {
+            margin-top: 20px;
+            font-size: 0.6em;
+            color: #555;
+        }
+
         /* Media query for smaller screens (mobile) */
         @media (max-width: 768px) {
             button {
@@ -75,6 +82,13 @@
                 min-width: 90px; /* Minimum width to keep the button legible */
             }
         }
+
+        /* Audio player */
+        #audio-player {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
     </style>
 </head>
 <body>
@@ -82,15 +96,28 @@
     <button id="start-btn">Start</button>
     <button id="stop-btn" disabled>Stop</button>
     <button id="email-btn" disabled>Email</button>
+    <button id="play-audio-btn" disabled>Play</button>
+    <!-- <button id="download-audio-btn" disabled>Download Audio</button>
+ -->
+    
     <div id="transcript-container">
         <div id="transcript">Transcript will appear here...</div>
     </div>
-
+    <!-- Audio player -->
+    <audio id="audio-player" controls></audio>
+    <!-- Footnote -->
+    <div class="footnote">
+        Best performance on Google Chrome browser.
+    </div>
     <script>
-        // Check if the browser supports the Chrome-specific webkitSpeechRecognition
-        if (!('webkitSpeechRecognition' in window)) {
-            alert('Sorry, your browser does not support speech recognition. Please use Google Chrome.');
-        } else {
+        // Make sure the script runs after the DOM has fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if the browser supports the necessary APIs
+            if (!('webkitSpeechRecognition' in window) || !('MediaRecorder' in window)) {
+                alert('Sorry, your browser does not support the necessary features. Please use Google Chrome.');
+                return;
+            }
+
             // Initialize the Chrome-specific webkitSpeechRecognition object
             const recognition = new webkitSpeechRecognition();
 
@@ -103,8 +130,12 @@
             const startBtn = document.getElementById('start-btn');
             const stopBtn = document.getElementById('stop-btn');
             const emailBtn = document.getElementById('email-btn');
+            // const downloadAudioBtn = document.getElementById('download-audio-btn');
+            const playAudioBtn = document.getElementById('play-audio-btn');
+
             const transcriptDiv = document.getElementById('transcript');
             const transcriptContainer = document.getElementById('transcript-container');
+            const audioPlayer = document.getElementById('audio-player');
 
 
             // Flags to manage recognition state and timestamps
@@ -113,19 +144,38 @@
             let startTimestamp = ''; // Store the start timestamp
             let endTimestamp = ''; // Store the end timestamp
 
-            // Start recognition
-            startBtn.addEventListener('click', () => {
+            // Audio recording variables
+            let mediaRecorder;
+            let audioChunks = [];
+
+            // Start recognition and recording
+            startBtn.addEventListener('click', async () => {
                 if (!isRecognizing) {
                     recognition.start();
                     isRecognizing = true;
                     startBtn.disabled = true;
                     stopBtn.disabled = false;
                     emailBtn.disabled = true; // Disable the email button while listening
+                    // downloadAudioBtn.disabled = true; // Disable the download button while recording
+                    playAudioBtn.disabled = true; // Disable the play audio button while recording
                     transcriptDiv.textContent = 'Listening...';
 
-                    // Capture the start timestamp
-                    const now = new Date();
-                    startTimestamp = now.toLocaleDateString() + ', ' + now.toLocaleTimeString();
+                    // Start audio recording
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.ondataavailable = event => {
+                            audioChunks.push(event.data);
+                        };
+                        mediaRecorder.start();
+
+                        // Capture the start timestamp
+                        const now = new Date();
+                        startTimestamp = now.toLocaleDateString() + ', ' + now.toLocaleTimeString();
+                    } catch (error) {
+                        console.error('Error accessing microphone:', error);
+                        alert('Unable to access the microphone.');
+                    }
                 }
             });
 
@@ -133,16 +183,39 @@
             stopBtn.addEventListener('click', () => {
                 if (isRecognizing) {
                     recognition.stop();
+                    mediaRecorder.stop();
                     isRecognizing = false;
                     startBtn.disabled = false;
                     stopBtn.disabled = true;
                     emailBtn.disabled = false; // Enable the email button
+                    playAudioBtn.disabled = false; // Enable the play audio button
+                    // downloadAudioBtn.disabled = false; 
                     transcriptDiv.textContent += ' (Stopped Listening)';
 
                     // Capture the end timestamp
                     const now = new Date();
                     endTimestamp = now.toLocaleDateString() + ', ' + now.toLocaleTimeString();
                 }
+            });
+
+            // Download the recorded audio
+            // downloadAudioBtn.addEventListener('click', () => {
+            //     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            //     const audioUrl = URL.createObjectURL(audioBlob);
+            //     const a = document.createElement('a');
+            //     a.href = audioUrl;
+            //     a.download = 'recording.webm';
+            //     document.body.appendChild(a);
+            //     a.click();
+            //     document.body.removeChild(a);
+            // });
+
+            // Play the recorded audio
+            playAudioBtn.addEventListener('click', () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioPlayer.src = audioUrl;
+                audioPlayer.play();
             });
 
             // Process the results
@@ -184,7 +257,7 @@
                 const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
                 window.open(mailtoLink, '_blank'); // Open email client in a new window/tab
             });
-        }
+        });
     </script>
 </body>
 </html>
