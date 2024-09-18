@@ -96,9 +96,9 @@
     <button id="start-btn">Start</button>
     <button id="stop-btn" disabled>Stop</button>
     <button id="email-btn" disabled>Email</button>
-    <button id="play-audio-btn" disabled>Play</button>
-    <!-- <button id="download-audio-btn" disabled>Download Audio</button>
- -->
+    <button id="play-audio-btn" disabled>Play Audio</button>
+    <button id="download-audio-btn" disabled>Download Audio</button>
+
     
     <div id="transcript-container">
         <div id="transcript">Transcript will appear here...</div>
@@ -130,7 +130,7 @@
             const startBtn = document.getElementById('start-btn');
             const stopBtn = document.getElementById('stop-btn');
             const emailBtn = document.getElementById('email-btn');
-            // const downloadAudioBtn = document.getElementById('download-audio-btn');
+            const downloadAudioBtn = document.getElementById('download-audio-btn');
             const playAudioBtn = document.getElementById('play-audio-btn');
 
             const transcriptDiv = document.getElementById('transcript');
@@ -156,7 +156,7 @@
                     startBtn.disabled = true;
                     stopBtn.disabled = false;
                     emailBtn.disabled = true; // Disable the email button while listening
-                    // downloadAudioBtn.disabled = true; // Disable the download button while recording
+                    downloadAudioBtn.disabled = true; // Disable the download button while recording
                     playAudioBtn.disabled = true; // Disable the play audio button while recording
                     transcriptDiv.textContent = 'Listening...';
 
@@ -189,7 +189,7 @@
                     stopBtn.disabled = true;
                     emailBtn.disabled = false; // Enable the email button
                     playAudioBtn.disabled = false; // Enable the play audio button
-                    // downloadAudioBtn.disabled = false; 
+                    downloadAudioBtn.disabled = false; 
                     transcriptDiv.textContent += ' (Stopped Listening)';
 
                     // Capture the end timestamp
@@ -199,16 +199,16 @@
             });
 
             // Download the recorded audio
-            // downloadAudioBtn.addEventListener('click', () => {
-            //     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            //     const audioUrl = URL.createObjectURL(audioBlob);
-            //     const a = document.createElement('a');
-            //     a.href = audioUrl;
-            //     a.download = 'recording.webm';
-            //     document.body.appendChild(a);
-            //     a.click();
-            //     document.body.removeChild(a);
-            // });
+            downloadAudioBtn.addEventListener('click', () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const a = document.createElement('a');
+                a.href = audioUrl;
+                a.download = 'recording.webm';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
 
             // Play the recorded audio
             playAudioBtn.addEventListener('click', () => {
