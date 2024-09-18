@@ -212,7 +212,7 @@
 
             // Play the recorded audio
             playAudioBtn.addEventListener('click', () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm; codecs=opus' });
                 const audioUrl = URL.createObjectURL(audioBlob);
                 audioPlayer.src = audioUrl;
                 audioPlayer.play();
