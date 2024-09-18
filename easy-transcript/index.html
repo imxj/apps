@@ -21,14 +21,20 @@
             box-sizing: border-box;
         }
 
-        #transcript {
+        #transcript-container {
+            position: relative; /* Position relative for positioning the copy button */
             margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
             width: 100%;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+            max-height: 300px; /* Set a max height to allow scrolling */
+            overflow-y: auto; /* Add vertical scroll if the content overflows */
+            border: 1px solid #ccc; /* Add border for better visibility */
+        }
+
+        #transcript {
+            padding: 10px;
             font-size: 1.2em;
             overflow-wrap: break-word;
             word-wrap: break-word;
@@ -67,7 +73,9 @@
     <button id="start-btn">Start</button>
     <button id="stop-btn" disabled>Stop</button>
     <button id="email-btn" disabled>Email</button>
-    <div id="transcript">Transcript will appear here...</div>
+    ]<div id="transcript-container">
+        <div id="transcript">Transcript will appear here...</div>
+    </div>
 
     <script>
         // Check if the browser supports the Chrome-specific webkitSpeechRecognition
@@ -87,6 +95,8 @@
             const stopBtn = document.getElementById('stop-btn');
             const emailBtn = document.getElementById('email-btn');
             const transcriptDiv = document.getElementById('transcript');
+            const transcriptContainer = document.getElementById('transcript-container');
+
 
             // Flags to manage recognition state and timestamps
             let isRecognizing = false;
@@ -141,6 +151,9 @@
                     }
                 }
                 transcriptDiv.textContent = finalTranscript + interimTranscript;
+
+                // Auto-scroll to the bottom of the transcript container
+                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
             };
 
             // Handle errors
