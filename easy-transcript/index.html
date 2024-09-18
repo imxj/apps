@@ -96,19 +96,21 @@
     <button id="start-btn">Start</button>
     <button id="stop-btn" disabled>Stop</button>
     <button id="email-btn" disabled>Email</button>
-    <!-- <button id="play-audio-btn" disabled>Play Audio</button>
-    <button id="download-audio-btn" disabled>Download Audio</button> -->
+    <button id="play-audio-btn" disabled>Play Audio</button>
+    <button id="download-audio-btn" disabled>Download Audio</button>
 
     
     <div id="transcript-container">
         <div id="transcript">Transcript will appear here...</div>
     </div>
     <!-- Audio player -->
-    <!-- <audio id="audio-player" controls></audio> -->
+    <audio id="audio-player" controls></audio>
     <!-- Footnote -->
     <div class="footnote">
         Best performance on Google Chrome browser.
     </div>
+    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+
     <script>
         // Make sure the script runs after the DOM has fully loaded
         document.addEventListener('DOMContentLoaded', () => {
@@ -130,12 +132,12 @@
             const startBtn = document.getElementById('start-btn');
             const stopBtn = document.getElementById('stop-btn');
             const emailBtn = document.getElementById('email-btn');
-            // const downloadAudioBtn = document.getElementById('download-audio-btn');
-            // const playAudioBtn = document.getElementById('play-audio-btn');
-            // const audioPlayer = document.getElementById('audio-player');
+            const downloadAudioBtn = document.getElementById('download-audio-btn');
+            const playAudioBtn = document.getElementById('play-audio-btn');
 
             const transcriptDiv = document.getElementById('transcript');
             const transcriptContainer = document.getElementById('transcript-container');
+            const audioPlayer = document.getElementById('audio-player');
 
 
             // Flags to manage recognition state and timestamps
@@ -145,8 +147,9 @@
             let endTimestamp = ''; // Store the end timestamp
 
             // Audio recording variables
-            let mediaRecorder;
-            let audioChunks = [];
+            let audioContext;
+            let recorder;
+            let audioBlob;
 
             // Start recognition and recording
             startBtn.addEventListener('click', async () => {
@@ -156,18 +159,17 @@
                     startBtn.disabled = true;
                     stopBtn.disabled = false;
                     emailBtn.disabled = true; // Disable the email button while listening
-                    // downloadAudioBtn.disabled = true; // Disable the download button while recording
-                    // playAudioBtn.disabled = true; // Disable the play audio button while recording
+                    downloadAudioBtn.disabled = true; // Disable the download button while recording
+                    playAudioBtn.disabled = true; // Disable the play audio button while recording
                     transcriptDiv.textContent = 'Listening...';
 
                     // Start audio recording
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        mediaRecorder = new MediaRecorder(stream);
-                        mediaRecorder.ondataavailable = event => {
-                            audioChunks.push(event.data);
-                        };
-                        mediaRecorder.start();
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const input = audioContext.createMediaStreamSource(stream);
+                        recorder = new Recorder(input, { numChannels: 1 });
+                        recorder.record();
 
                         // Capture the start timestamp
                         const now = new Date();
@@ -183,40 +185,49 @@
             stopBtn.addEventListener('click', () => {
                 if (isRecognizing) {
                     recognition.stop();
-                    mediaRecorder.stop();
                     isRecognizing = false;
                     startBtn.disabled = false;
                     stopBtn.disabled = true;
                     emailBtn.disabled = false; // Enable the email button
-                    // playAudioBtn.disabled = false; // Enable the play audio button
-                    // downloadAudioBtn.disabled = false; 
+                    playAudioBtn.disabled = false; // Enable the play audio button
+                    downloadAudioBtn.disabled = false; 
                     transcriptDiv.textContent += ' (Stopped Listening)';
-
+                    // Export audio using Recorder.js
+                    recorder.exportWAV(blob => {
+                        audioBlob = blob;
+                    });
                     // Capture the end timestamp
                     const now = new Date();
                     endTimestamp = now.toLocaleDateString() + ', ' + now.toLocaleTimeString();
                 }
             });
 
-            // // Download the recorded audio
-            // downloadAudioBtn.addEventListener('click', () => {
-            //     const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            //     const audioUrl = URL.createObjectURL(audioBlob);
-            //     const a = document.createElement('a');
-            //     a.href = audioUrl;
-            //     a.download = 'recording.webm';
-            //     document.body.appendChild(a);
-            //     a.click();
-            //     document.body.removeChild(a);
-            // });
+            // Download the recorded audio
+            downloadAudioBtn.addEventListener('click', () => {
+                if (audioBlob) {
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    const a = document.createElement('a');
+                    a.href = audioUrl;
+                    a.download = 'recording.wav';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    alert('No audio available.');
+                }
+            });
 
-            // // Play the recorded audio
-            // playAudioBtn.addEventListener('click', () => {
-            //     const audioBlob = new Blob(audioChunks, { type: 'audio/webm; codecs' });
-            //     const audioUrl = URL.createObjectURL(audioBlob);
-            //     audioPlayer.src = audioUrl;
-            //     audioPlayer.play();
-            // });
+            // Play the recorded audio
+            playAudioBtn.addEventListener('click', () => {
+                if (audioBlob) {
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.play();
+                } else {
+                    alert('No audio available.');
+                }
+            });
 
             // Process the results
             recognition.onresult = (event) => {
