@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="web, quick, easy, transcript, speech recognition, free, browser" />
+    <title>Easy Transcript</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #transcript {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1.2em;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            white-space: pre-wrap; /* Maintain line breaks */
+            text-align: left; /* Align text to the left */
+        }
+
+        button {
+            padding: 15px 20px;
+            font-size: 1.2em;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            display: inline-block;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        @media (min-width: 768px) {
+            button {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Easy Transcript</h1>
+    <button id="start-btn">Start</button>
+    <button id="stop-btn" disabled>Stop</button>
+    <button id="email-btn" disabled>Email</button>
+    <div id="transcript">Transcript will appear here...</div>
+
+    <script>
+        // Check if the browser supports the Chrome-specific webkitSpeechRecognition
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Sorry, your browser does not support speech recognition. Please use Google Chrome.');
+        } else {
+            // Initialize the Chrome-specific webkitSpeechRecognition object
+            const recognition = new webkitSpeechRecognition();
+
+            // Set recognition parameters
+            recognition.continuous = true; // Set to true for continuous recognition
+            recognition.interimResults = true; // Show interim results for real-time feedback
+            recognition.lang = 'en-US'; // Set the language
+
+            // Get the elements
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const emailBtn = document.getElementById('email-btn');
+            const transcriptDiv = document.getElementById('transcript');
+
+            // Flags to manage recognition state and timestamps
+            let isRecognizing = false;
+            let finalTranscript = '';
+            let startTimestamp = ''; // Store the start timestamp
+            let endTimestamp = ''; // Store the end timestamp
+
+            // Start recognition
+            startBtn.addEventListener('click', () => {
+                if (!isRecognizing) {
+                    recognition.start();
+                    isRecognizing = true;
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    emailBtn.disabled = true; // Disable the email button while listening
+                    transcriptDiv.textContent = 'Listening...';
+
+                    // Capture the start timestamp
+                    const now = new Date();
+                    startTimestamp = now.toLocaleDateString() + ', ' + now.toLocaleTimeString();
+                }
+            });
+
+            // Stop recognition
+            stopBtn.addEventListener('click', () => {
+                if (isRecognizing) {
+                    recognition.stop();
+                    isRecognizing = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    emailBtn.disabled = false; // Enable the email button
+                    transcriptDiv.textContent += ' (Stopped Listening)';
+
+                    // Capture the end timestamp
+                    const now = new Date();
+                    endTimestamp = now.toLocaleDateString() + ', ' + now.toLocaleTimeString();
+                }
+            });
+
+            // Process the results
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const result = event.results[i];
+                    if (result.isFinal) {
+                        const timestamp = new Date().toLocaleTimeString();
+                        const sentenceWithTimestamp = `[${timestamp}] ${result[0].transcript}\n`;
+                        finalTranscript += sentenceWithTimestamp;
+                    } else {
+                        interimTranscript += result[0].transcript;
+                    }
+                }
+                transcriptDiv.textContent = finalTranscript + interimTranscript;
+            };
+
+            // Handle errors
+            recognition.onerror = (event) => {
+                transcriptDiv.textContent = 'Error occurred in recognition: ' + event.error;
+            };
+
+            // Restart recognition when it ends to keep it continuous
+            recognition.onend = () => {
+                if (isRecognizing) {
+                    recognition.start(); // Restart recognition
+                }
+            };
+
+            // Email the transcript
+            emailBtn.addEventListener('click', () => {
+                const subject = encodeURIComponent('Transcript from ' + startTimestamp + ' to ' + endTimestamp);
+                const body = encodeURIComponent(finalTranscript);
+                const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+                window.open(mailtoLink, '_blank'); // Open email client in a new window/tab
+            });
+        }
+    </script>
+</body>
+</html>
