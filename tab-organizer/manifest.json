@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Organizer",
+  "version": "1.1",
+  "description": "Closes duplicate tabs and groups tabs by domain",
+  "permissions": ["tabs"],
+  "action": {
+    "default_title": "Organize Tabs"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
