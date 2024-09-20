@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Molecule Editor</title>
+    <script src="openchemlib-minimal.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/kekule/dist/themes/default/kekule.css" />
+<script src="https://cdn.jsdelivr.net/npm/kekule/dist/kekule.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #molecule-editor {
+            width: 600px;
+            height: 400px;
+            border: 1px solid #ccc;
+        }
+        #smiles-input, #smiles-output {
+            width: 100%;
+            margin-top: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Online Molecule Editor</h1>
+    <div>
+        <label for="smiles-input">Enter SMILES string:</label>
+        <input type="text" id="smiles-input" placeholder="e.g., CCO">
+        <button id="load-btn">Load Molecule</button>
+    </div>
+    <div id="molecule-editor"></div>
+    <div>
+        <button id="get-smiles-btn">Get SMILES</button>
+        <input type="text" id="smiles-output" readonly>
+    </div>
+
+   
+    <script>
+        let OCL;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize OpenChemLib
+            OCL = window.OCL;
+            
+            const editor = new Kekule.Editor.Composer(document.getElementById('molecule-editor'));
+            const smilesInput = document.getElementById('smiles-input');
+            const smilesOutput = document.getElementById('smiles-output');
+            const loadBtn = document.getElementById('load-btn');
+            const getSmilesBtn = document.getElementById('get-smiles-btn');
+
+            loadBtn.addEventListener('click', () => {
+                const smiles = smilesInput.value;
+                try {
+                    // Use OpenChemLib to parse SMILES
+                    const mol = OCL.Molecule.fromSmiles(smiles);
+                    const molfile = mol.toMolfile();
+
+                    // Use Kekule.js to read the molfile and set it in the editor
+                    const kekuleMol = Kekule.IO.loadFormatData(molfile, 'mol');
+                    editor.setChemObj(kekuleMol);
+                } catch (error) {
+                    alert('Invalid SMILES string or error loading molecule. Please check your input.');
+                    console.error(error);
+                }
+            });
+
+            getSmilesBtn.addEventListener('click', () => {
+                try {
+                    // Get the molecule from Kekule.js editor
+                    const kekuleMol = editor.getChemObj();
+                    
+                    // Convert to molfile
+                    const molfile = Kekule.IO.saveFormatData(kekuleMol, 'mol');
+                    
+                    // Use OpenChemLib to convert molfile to SMILES
+                    const mol = OCL.Molecule.fromMolfile(molfile);
+                    const smiles = mol.toSmiles();
+                    
+                    smilesOutput.value = smiles;
+                } catch (error) {
+                    alert('Error generating SMILES. Please check your molecule.');
+                    console.error(error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
