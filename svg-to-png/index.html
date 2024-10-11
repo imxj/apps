@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG to PNG/SVG Converter</title>
+</head>
+<body>
+    <h2>SVG to PNG/SVG Converter</h2>
+    <input type="file" id="svgInput" accept="image/svg+xml">
+    <br><br>
+    <label for="resolution">Select Resolution:</label>
+    <select id="resolution">
+        <option value="16">16x16</option>
+        <option value="48">48x48</option>
+        <option value="128">128x128</option>
+    </select>
+    <br><br>
+    <button onclick="convertSVG()">Convert and Download</button>
+    <br><br>
+    <span id="downloadLinks"></span>
+    <div id="svgDisplay" style="width: 100%; max-width: 1000px; height: auto; transform: scale(0.5); transform-origin: top left; overflow: hidden;"></div>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        document.getElementById('svgInput').addEventListener('change', function () {
+            const fileInput = document.getElementById('svgInput');
+            if (!fileInput.files.length) {
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const svgText = e.target.result;
+                document.getElementById('svgDisplay').innerHTML = svgText;
+            };
+
+            reader.readAsText(file);
+        });
+
+        function convertSVG() {
+            const fileInput = document.getElementById('svgInput');
+            const resolution = parseInt(document.getElementById('resolution').value);
+            if (!fileInput.files.length) {
+                alert('Please upload an SVG file.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const svgText = e.target.result;
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+                const svgElement = svgDoc.documentElement;
+
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = resolution;
+                canvas.height = resolution;
+
+                const img = new Image();
+                const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
+
+                img.onload = function () {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, resolution, resolution);
+                    URL.revokeObjectURL(url);
+
+                    // Create download links
+                    const pngLink = document.createElement('a');
+                    pngLink.href = canvas.toDataURL('image/png');
+                    pngLink.download = `converted_${resolution}x${resolution}.png`;
+                    pngLink.textContent = `Download ${resolution}x${resolution} PNG`;
+                    pngLink.style.display = 'block';
+                    document.getElementById('downloadLinks').appendChild(pngLink);
+                };
+
+                // Directly use svgText as data URL for SVG download
+                const svgLink = document.createElement('a');
+                const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+                svgLink.href = svgDataUrl;
+                svgLink.download = `converted_${resolution}x${resolution}.svg`;
+                svgLink.textContent = `Download ${resolution}x${resolution} SVG`;
+                svgLink.style.display = 'block';
+                document.getElementById('downloadLinks').appendChild(svgLink);
+
+                img.src = url;
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
