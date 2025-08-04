@@ -19,7 +19,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             line-height: 1.6;
@@ -33,53 +33,142 @@
 
         .row {
             display: flex;
-            justify-content: space-around;
-            /* Adjusts spacing around each card */
+            justify-content: flex-start;
+            /* Aligns cards to the left */
             margin-bottom: 20px;
             /* Space between rows */
+            flex-wrap: wrap;
+            /* Allow wrapping on smaller screens */
         }
 
         .card {
             background-color: white;
             border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            flex: 1 0 30%;
-            /* Flex-grow, Flex-shrink, Flex-basis */
+            flex: 0 0 18%;
+            /* Flex-grow: 0 prevents cards from expanding, Flex-shrink: 0, Flex-basis: 18% */
             box-sizing: border-box;
             /* Includes padding and border in the element's total width and height */
-            margin: 0 10px;
-            /* Spacing between cards */
+            margin: 0 1% 0 0;
+            /* Right margin only for consistent left-aligned spacing */
+            min-width: 150px;
+            /* Minimum width for readability */
         }
 
         .card h2 {
             margin-top: 0;
             color: #28a745;
+            font-size: 1.1em;
+            /* Slightly smaller heading */
         }
 
         .card p {
             margin-bottom: 15px;
+            font-size: 0.9em;
+            /* Slightly smaller text */
         }
 
         .card a {
             display: inline-block;
-            padding: 10px 15px;
+            padding: 8px 12px;
             background-color: #28a745;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s;
+            font-size: 0.9em;
         }
 
         .card a:hover {
             background-color: #218838;
+        }
+
+        .card:last-child {
+            margin-right: 0;
+            /* Remove right margin from last card in row */
+        }
+
+        /* Search box styling */
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 50%;
+            max-width: 400px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: #4CAF50;
+        }
+
+        .search-box::placeholder {
+            color: #999;
+        }
+
+        /* Hide cards that don't match search */
+        .card.hidden {
+            display: none;
+        }
+
+        /* No results message */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+            display: none;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 1024px) {
+            .card {
+                flex: 0 0 30%;
+                /* 3 cards per row on medium screens */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                flex: 0 0 45%;
+                /* 2 cards per row on small screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                flex: 0 0 100%;
+                /* 1 card per row on very small screens */
+                margin: 0 0 10px 0;
+            }
+
+            .search-box {
+                width: 90%;
+            }
         }
     </style>
 </head>
 
 <body>
     <h1>Tools Created By AI</h1>
+
+    <div class="search-container">
+        <input type="text" class="search-box" placeholder="Search tools..." id="searchInput">
+    </div>
+
+    <div class="no-results" id="noResults">
+        No tools found matching your search.
+    </div>
+
     <div class="row">
         <div class="card">
             <h2>DIY Passport Photos</h2>
@@ -91,8 +180,6 @@
             <p>Render image for the pasted base64 string.</p>
             <a href="base64-viewer/index.html" target="_blank">Visit Tool</a>
         </div>
-    </div>
-    <div class="row">
         <div class="card">
             <h2>Easy transcript</h2>
             <p>Easy transcript tool with real time speech recognition.</p>
@@ -103,20 +190,18 @@
             <p>Live preview of markdown to HTML.</p>
             <a href="markdown-editor/index.html" target="_blank">Visit Tool</a>
         </div>
-    </div>
-    <div class="row">
         <div class="card">
             <h2>Timezone Converter</h2>
             <p>Convert local timezone to any timezone in the world</p>
             <a href="timezone-converter/index.html" target="_blank">Visit Tool</a>
         </div>
+    </div>
+    <div class="row">
         <div class="card">
             <h2>Morgage Calculator</h2>
             <p>Calculate the morgage payment.</p>
             <a href="morgage-calculator/index.html" target="_blank">Visit Tool</a>
         </div>
-    </div>
-    <div class="row">
         <div class="card">
             <h2>Regex Tester</h2>
             <p>Regex Tester and Debugger Online.</p>
@@ -127,8 +212,6 @@
             <p>Visualize and edit the molecule online.</p>
             <a href="online-molecule-editor/index.html" target="_blank">Visit Tool</a>
         </div>
-    </div>
-    <div class="row">
         <div class="card">
             <h2>SVG to PNG Converter</h2>
             <p>Convert SVG image to PNG format Online.</p>
@@ -152,6 +235,48 @@
             <a href="circle-crop-image/index.html" target="_blank">Visit Tool</a>
         </div>
     </div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const noResultsMsg = document.getElementById('noResults');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.querySelector('h2').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+
+                // Search in both title and description
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResultsMsg.style.display = 'block';
+            } else {
+                noResultsMsg.style.display = 'none';
+            }
+        });
+
+        // Handle search on page load if there's a search query in URL
+        window.addEventListener('load', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('search');
+            if (searchQuery) {
+                searchInput.value = searchQuery;
+                searchInput.dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
 </body>
 
 </html>
