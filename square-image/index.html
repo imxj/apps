@@ -569,11 +569,14 @@
                 cropData.y = newY;
 
                 updateCropArea();
-                processImage();
+                // Don't process image during drag for better performance
             }
         });
 
         document.addEventListener('mouseup', () => {
+            if (isDragging && currentImage && currentMethod === 'crop') {
+                processImage(); // Process image only when drag ends
+            }
             isDragging = false;
         });
 

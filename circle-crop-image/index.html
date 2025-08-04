@@ -626,13 +626,16 @@
                 cropData.y = Math.max(0, Math.min(cropData.y, maxY));
 
                 updateCropCirclePosition();
-                updatePreview();
+                // Don't update preview during drag for better performance
             } else if (isResizing) {
                 handleResize(e);
             }
         });
 
         document.addEventListener('mouseup', () => {
+            if ((isDragging || isResizing) && currentImage) {
+                updatePreview(); // Update preview only when drag/resize ends
+            }
             isDragging = false;
             isResizing = false;
             activeHandle = null;
@@ -674,7 +677,7 @@
             circleSizeValue.textContent = sizePercent + '%';
 
             updateCropCirclePosition();
-            updatePreview();
+            // Don't update preview during resize for better performance
         }
 
         function handleFile(file) {
