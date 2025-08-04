@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords"
+        content="circle, crop, image, converter, round, profile picture, avatar, online, free, browser" />
+    <meta name="description"
+        content="Crop any image into a perfect circle - ideal for profile pictures, social media, and design projects" />
+    <meta property="og:title" content="Circle Crop Image Tool" />
+    <meta property="og:description"
+        content="Transform any image into a perfect circle with advanced options including transparent background, color padding, and blur effects" />
+    <title>Circle Crop Image - Profile Picture Creator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #e91e63;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed #e91e63;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+            background-color: #fce4ec;
+        }
+
+        .upload-area:hover {
+            background-color: #f8bbd0;
+        }
+
+        .upload-area.dragover {
+            background-color: #f48fb1;
+            border-color: #c2185b;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .upload-button {
+            background-color: #e91e63;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .upload-button:hover {
+            background-color: #c2185b;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .editor-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .crop-container {
+            position: relative;
+            display: inline-block;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            max-width: 100%;
+            max-height: 500px;
+        }
+
+        .crop-image {
+            display: block;
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
+        }
+
+        .crop-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .crop-circle {
+            position: absolute;
+            border: 2px solid #e91e63;
+            border-radius: 50%;
+            cursor: move;
+            pointer-events: all;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+
+        .crop-circle:hover {
+            border-color: #c2185b;
+        }
+
+        .crop-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #e91e63;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: nwse-resize;
+        }
+
+        .crop-handle.se {
+            bottom: -8px;
+            right: -8px;
+        }
+
+        .crop-handle.ne {
+            top: -8px;
+            right: -8px;
+            cursor: nesw-resize;
+        }
+
+        .crop-handle.sw {
+            bottom: -8px;
+            left: -8px;
+            cursor: nesw-resize;
+        }
+
+        .crop-handle.nw {
+            top: -8px;
+            left: -8px;
+        }
+
+        .controls-panel {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 5px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e91e63;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e91e63;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .background-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bg-option {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .bg-option:hover {
+            border-color: #e91e63;
+            background-color: #fce4ec;
+        }
+
+        .bg-option.active {
+            border-color: #e91e63;
+            background-color: #f8bbd0;
+        }
+
+        .color-picker-group {
+            display: none;
+        }
+
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .blur-controls {
+            display: none;
+        }
+
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .preview-container {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .preview-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-options {
+            margin-top: 20px;
+        }
+
+        .download-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+
+        .download-button:hover {
+            background-color: #45a049;
+        }
+
+        .download-button.secondary {
+            background-color: #2196F3;
+        }
+
+        .download-button.secondary:hover {
+            background-color: #1976D2;
+        }
+
+        .reset-button {
+            background-color: #666;
+            color: white;
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .reset-button:hover {
+            background-color: #555;
+        }
+
+        .size-presets {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .preset-button {
+            padding: 5px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .preset-button:hover {
+            border-color: #e91e63;
+            background-color: #fce4ec;
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Circle Crop Image Tool</h1>
+        <p class="description">Transform any image into a perfect circle - ideal for profile pictures, social media
+            avatars, and design projects.</p>
+
+        <div class="upload-area" id="uploadArea">
+            <p class="upload-text">Drag and drop an image here or</p>
+            <button class="upload-button">Choose Image</button>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="editor-section" id="editorSection">
+            <div class="editor-container">
+                <div class="crop-container" id="cropContainer">
+                    <img id="cropImage" class="crop-image" alt="Image to crop">
+                    <div class="crop-overlay">
+                        <div class="crop-circle" id="cropCircle">
+                            <div class="crop-handle nw"></div>
+                            <div class="crop-handle ne"></div>
+                            <div class="crop-handle sw"></div>
+                            <div class="crop-handle se"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-panel">
+                    <div class="control-group">
+                        <label class="control-label">Circle Size:</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="circleSize" min="50" max="100" value="80">
+                            <span class="slider-value" id="circleSizeValue">80%</span>
+                        </div>
+                        <div class="size-presets">
+                            <button class="preset-button" data-size="100">Max</button>
+                            <button class="preset-button" data-size="80">Large</button>
+                            <button class="preset-button" data-size="60">Medium</button>
+                            <button class="preset-button" data-size="40">Small</button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Background Type:</label>
+                        <div class="background-options">
+                            <div class="bg-option active" data-bg="transparent">
+                                <div>Transparent</div>
+                            </div>
+                            <div class="bg-option" data-bg="color">
+                                <div>Color</div>
+                            </div>
+                            <div class="bg-option" data-bg="blur">
+                                <div>Blur</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group color-picker-group" id="colorPickerGroup">
+                        <label class="control-label">Background Color:</label>
+                        <input type="color" id="bgColor" class="color-picker" value="#ffffff">
+                    </div>
+
+                    <div class="control-group blur-controls" id="blurControls">
+                        <label class="control-label">Blur Intensity:</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="blurIntensity" min="5" max="50" value="20">
+                            <span class="slider-value" id="blurValue">20px</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Output Size:</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="outputSize" min="100" max="1000" step="50"
+                                value="500">
+                            <span class="slider-value" id="outputSizeValue">500px</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h2>Preview</h2>
+            <div class="preview-container">
+                <img id="previewImage" class="preview-image" alt="Circle preview">
+            </div>
+            <p class="info-text" id="infoText"></p>
+            <div class="download-options">
+                <button class="download-button" id="downloadPNG">Download PNG</button>
+                <button class="download-button secondary" id="downloadJPG">Download JPG</button>
+            </div>
+            <div>
+                <button class="reset-button" id="resetButton">Start Over</button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="canvas" style="display: none;"></canvas>
+    <canvas id="tempCanvas" style="display: none;"></canvas>
+
+    <script>
+        // Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const editorSection = document.getElementById('editorSection');
+        const cropContainer = document.getElementById('cropContainer');
+        const cropImage = document.getElementById('cropImage');
+        const cropCircle = document.getElementById('cropCircle');
+        const circleSize = document.getElementById('circleSize');
+        const circleSizeValue = document.getElementById('circleSizeValue');
+        const bgOptions = document.querySelectorAll('.bg-option');
+        const colorPickerGroup = document.getElementById('colorPickerGroup');
+        const bgColor = document.getElementById('bgColor');
+        const blurControls = document.getElementById('blurControls');
+        const blurIntensity = document.getElementById('blurIntensity');
+        const blurValue = document.getElementById('blurValue');
+        const outputSize = document.getElementById('outputSize');
+        const outputSizeValue = document.getElementById('outputSizeValue');
+        const previewSection = document.getElementById('previewSection');
+        const previewImage = document.getElementById('previewImage');
+        const infoText = document.getElementById('infoText');
+        const downloadPNG = document.getElementById('downloadPNG');
+        const downloadJPG = document.getElementById('downloadJPG');
+        const resetButton = document.getElementById('resetButton');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tempCanvas = document.getElementById('tempCanvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        const presetButtons = document.querySelectorAll('.preset-button');
+
+        // State
+        let currentImage = null;
+        let cropData = { x: 0, y: 0, radius: 100 };
+        let isDragging = false;
+        let isResizing = false;
+        let dragStart = { x: 0, y: 0 };
+        let cropStart = { x: 0, y: 0, radius: 0 };
+        let activeHandle = null;
+        let backgroundType = 'transparent';
+        let imageScale = 1;
+
+        // Upload handlers
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        // Background type selection
+        bgOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                bgOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                backgroundType = option.dataset.bg;
+
+                colorPickerGroup.style.display = backgroundType === 'color' ? 'block' : 'none';
+                blurControls.style.display = backgroundType === 'blur' ? 'block' : 'none';
+
+                updatePreview();
+            });
+        });
+
+        // Controls
+        circleSize.addEventListener('input', () => {
+            circleSizeValue.textContent = circleSize.value + '%';
+            if (currentImage) {
+                updateCropCircle();
+                updatePreview();
+            }
+        });
+
+        bgColor.addEventListener('input', updatePreview);
+
+        blurIntensity.addEventListener('input', () => {
+            blurValue.textContent = blurIntensity.value + 'px';
+            updatePreview();
+        });
+
+        outputSize.addEventListener('input', () => {
+            outputSizeValue.textContent = outputSize.value + 'px';
+            updatePreview();
+        });
+
+        // Size presets
+        presetButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                circleSize.value = button.dataset.size;
+                circleSizeValue.textContent = button.dataset.size + '%';
+                if (currentImage) {
+                    updateCropCircle();
+                    updatePreview();
+                }
+            });
+        });
+
+        // Crop circle dragging and resizing
+        cropCircle.addEventListener('mousedown', (e) => {
+            if (e.target === cropCircle) {
+                isDragging = true;
+                dragStart.x = e.clientX;
+                dragStart.y = e.clientY;
+                cropStart.x = cropData.x;
+                cropStart.y = cropData.y;
+                e.preventDefault();
+            } else if (e.target.classList.contains('crop-handle')) {
+                isResizing = true;
+                activeHandle = e.target;
+                dragStart.x = e.clientX;
+                dragStart.y = e.clientY;
+                cropStart.x = cropData.x;
+                cropStart.y = cropData.y;
+                cropStart.radius = cropData.radius;
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const dx = e.clientX - dragStart.x;
+                const dy = e.clientY - dragStart.y;
+
+                cropData.x = cropStart.x + dx / imageScale;
+                cropData.y = cropStart.y + dy / imageScale;
+
+                // Constrain within image bounds
+                const maxX = cropImage.naturalWidth - cropData.radius * 2;
+                const maxY = cropImage.naturalHeight - cropData.radius * 2;
+                cropData.x = Math.max(0, Math.min(cropData.x, maxX));
+                cropData.y = Math.max(0, Math.min(cropData.y, maxY));
+
+                updateCropCirclePosition();
+                updatePreview();
+            } else if (isResizing) {
+                handleResize(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            isResizing = false;
+            activeHandle = null;
+        });
+
+        function handleResize(e) {
+            const rect = cropContainer.getBoundingClientRect();
+            const centerX = (cropData.x + cropData.radius) * imageScale;
+            const centerY = (cropData.y + cropData.radius) * imageScale;
+
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const dx = mouseX - centerX;
+            const dy = mouseY - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            let newRadius = distance / imageScale;
+
+            // Constrain radius
+            const maxRadius = Math.min(
+                cropData.x + cropData.radius,
+                cropData.y + cropData.radius,
+                cropImage.naturalWidth - cropData.x - cropData.radius,
+                cropImage.naturalHeight - cropData.y - cropData.radius
+            ) + cropData.radius;
+
+            newRadius = Math.max(20, Math.min(newRadius, maxRadius));
+
+            // Adjust position to keep circle within bounds
+            cropData.x = cropData.x + cropData.radius - newRadius;
+            cropData.y = cropData.y + cropData.radius - newRadius;
+            cropData.radius = newRadius;
+
+            // Update circle size slider
+            const maxPossibleRadius = Math.min(cropImage.naturalWidth, cropImage.naturalHeight) / 2;
+            const sizePercent = Math.round((cropData.radius / maxPossibleRadius) * 100);
+            circleSize.value = sizePercent;
+            circleSizeValue.textContent = sizePercent + '%';
+
+            updateCropCirclePosition();
+            updatePreview();
+        }
+
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Please upload a valid image file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    cropImage.src = e.target.result;
+                    initializeCrop();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function initializeCrop() {
+            editorSection.style.display = 'block';
+            previewSection.style.display = 'block';
+
+            // Calculate image scale to fit container
+            const containerWidth = cropContainer.clientWidth;
+            const maxHeight = 500;
+
+            const scaleX = containerWidth / currentImage.width;
+            const scaleY = maxHeight / currentImage.height;
+            imageScale = Math.min(scaleX, scaleY, 1);
+
+            cropImage.style.width = (currentImage.width * imageScale) + 'px';
+            cropImage.style.height = (currentImage.height * imageScale) + 'px';
+
+            // Initialize crop circle
+            const initialRadius = Math.min(currentImage.width, currentImage.height) * 0.4;
+            cropData = {
+                x: (currentImage.width - initialRadius * 2) / 2,
+                y: (currentImage.height - initialRadius * 2) / 2,
+                radius: initialRadius
+            };
+
+            updateCropCircle();
+            updatePreview();
+        }
+
+        function updateCropCircle() {
+            const sizePercent = parseInt(circleSize.value);
+            const maxRadius = Math.min(currentImage.width, currentImage.height) / 2;
+            cropData.radius = (maxRadius * sizePercent) / 100;
+
+            // Adjust position if circle goes out of bounds
+            cropData.x = Math.min(cropData.x, currentImage.width - cropData.radius * 2);
+            cropData.y = Math.min(cropData.y, currentImage.height - cropData.radius * 2);
+            cropData.x = Math.max(0, cropData.x);
+            cropData.y = Math.max(0, cropData.y);
+
+            updateCropCirclePosition();
+        }
+
+        function updateCropCirclePosition() {
+            cropCircle.style.left = (cropData.x * imageScale) + 'px';
+            cropCircle.style.top = (cropData.y * imageScale) + 'px';
+            cropCircle.style.width = (cropData.radius * 2 * imageScale) + 'px';
+            cropCircle.style.height = (cropData.radius * 2 * imageScale) + 'px';
+        }
+
+        function updatePreview() {
+            if (!currentImage) return;
+
+            const size = parseInt(outputSize.value);
+            canvas.width = size;
+            canvas.height = size;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+
+            if (backgroundType === 'transparent') {
+                // No background needed
+            } else if (backgroundType === 'color') {
+                ctx.fillStyle = bgColor.value;
+                ctx.fillRect(0, 0, size, size);
+            } else if (backgroundType === 'blur') {
+                // Create blurred background
+                tempCanvas.width = size;
+                tempCanvas.height = size;
+
+                // Draw scaled and blurred image
+                const scale = size / Math.min(currentImage.width, currentImage.height) * 1.2;
+                const scaledWidth = currentImage.width * scale;
+                const scaledHeight = currentImage.height * scale;
+                const x = (size - scaledWidth) / 2;
+                const y = (size - scaledHeight) / 2;
+
+                tempCtx.filter = `blur(${blurIntensity.value}px)`;
+                tempCtx.drawImage(currentImage, x, y, scaledWidth, scaledHeight);
+
+                // Draw blurred background to main canvas
+                ctx.drawImage(tempCanvas, 0, 0);
+            }
+
+            // Create circular clip
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.clip();
+
+            // Draw the cropped circle
+            const sourceX = cropData.x;
+            const sourceY = cropData.y;
+            const sourceSize = cropData.radius * 2;
+
+            ctx.drawImage(
+                currentImage,
+                sourceX, sourceY, sourceSize, sourceSize,
+                0, 0, size, size
+            );
+
+            ctx.restore();
+
+            // Update preview
+            const dataUrl = canvas.toDataURL('image/png');
+            previewImage.src = dataUrl;
+
+            // Update info text
+            infoText.textContent = `Output: ${size}×${size}px • ${backgroundType === 'transparent' ? 'PNG with transparency' : 'Background: ' + backgroundType}`;
+        }
+
+        // Download handlers
+        downloadPNG.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'circle-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        downloadJPG.addEventListener('click', () => {
+            // Create a new canvas with white background for JPG
+            const jpgCanvas = document.createElement('canvas');
+            const jpgCtx = jpgCanvas.getContext('2d');
+            jpgCanvas.width = canvas.width;
+            jpgCanvas.height = canvas.height;
+
+            // Fill white background
+            jpgCtx.fillStyle = '#ffffff';
+            jpgCtx.fillRect(0, 0, jpgCanvas.width, jpgCanvas.height);
+
+            // Draw the circle image
+            jpgCtx.drawImage(canvas, 0, 0);
+
+            const link = document.createElement('a');
+            link.download = 'circle-image.jpg';
+            link.href = jpgCanvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        });
+
+        // Reset
+        resetButton.addEventListener('click', () => {
+            currentImage = null;
+            fileInput.value = '';
+            editorSection.style.display = 'none';
+            previewSection.style.display = 'none';
+
+            // Reset controls
+            circleSize.value = 80;
+            circleSizeValue.textContent = '80%';
+            outputSize.value = 500;
+            outputSizeValue.textContent = '500px';
+            bgOptions.forEach(opt => opt.classList.remove('active'));
+            bgOptions[0].classList.add('active');
+            backgroundType = 'transparent';
+            colorPickerGroup.style.display = 'none';
+            blurControls.style.display = 'none';
+            bgColor.value = '#ffffff';
+            blurIntensity.value = 20;
+            blurValue.textContent = '20px';
+        });
+    </script>
+</body>
+
+</html>
