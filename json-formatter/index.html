@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter & Validator - Free Online JSON Tools | Format, Validate, Convert</title>
+    <meta name="description"
+        content="Free online JSON formatter and validator. Instantly format, validate, beautify, and minify JSON data. Convert JSON to YAML, view tree structure, check syntax errors with line numbers. No signup required.">
+    <meta name="keywords"
+        content="JSON formatter, JSON validator, JSON beautifier, JSON parser, JSON viewer, JSON to YAML converter, JSON minifier, JSON tree view, JSON syntax checker, online JSON tools, format JSON online, validate JSON, JSON editor">
+    <meta name="author" content="Small Web Tools">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://imxj.github.io/apps/json-formatter/">
+
+    <!-- Favicon -->
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="JSON Formatter & Validator - Free Online JSON Tools">
+    <meta property="og:description"
+        content="Format, validate, and transform JSON data online. Free JSON formatter with syntax validation, tree view, and YAML conversion.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://imxj.github.io/apps/json-formatter/">
+    <meta property="og:site_name" content="Small Web Tools">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="JSON Formatter & Validator - Free Online Tool">
+    <meta name="twitter:description"
+        content="Format, validate, and beautify JSON data instantly. Free online tool with tree view and YAML conversion.">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "JSON Formatter & Validator",
+        "description": "Free online JSON formatter, validator, and converter. Format messy JSON, validate syntax, convert to YAML, and view tree structure.",
+        "url": "https://imxj.github.io/apps/json-formatter/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Format and beautify JSON",
+            "Validate JSON syntax",
+            "Minify JSON",
+            "Convert JSON to YAML",
+            "Tree view visualization",
+            "Copy to clipboard"
+        ],
+        "creator": {
+            "@type": "Organization",
+            "name": "Small Web Tools",
+            "url": "https://imxj.github.io/apps/"
+        }
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://imxj.github.io/apps/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "JSON Formatter",
+                "item": "https://imxj.github.io/apps/json-formatter/"
+            }
+        ]
+        }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is JSON?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "JSON (JavaScript Object Notation) is a lightweight data-interchange format that's easy for humans to read and write, and easy for machines to parse and generate."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I use this JSON formatter?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Simply paste your JSON data into the input field on the left, and the formatted version will appear automatically on the right. You can also load sample data or upload a file."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is my JSON data secure?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! All processing happens directly in your browser. No data is sent to any server, ensuring complete privacy and security."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 500;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .nav-link:hover {
+            opacity: 1;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        .tool-description {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .primary-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .secondary-btn {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .secondary-btn:hover {
+            background-color: #7f8c8d;
+        }
+
+        .success-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .success-btn:hover {
+            background-color: #229954;
+        }
+
+        .error-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .error-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .editor-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .format-options {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .indent-select {
+            padding: 0.3rem 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            background-color: #f8f9fa;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .status-bar {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .status-bar.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status-bar.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .tree-view {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .tree-node {
+            margin-left: 1.5rem;
+        }
+
+        .tree-key {
+            color: #881391;
+            font-weight: bold;
+        }
+
+        .tree-string {
+            color: #0451a5;
+        }
+
+        .tree-number {
+            color: #098658;
+        }
+
+        .tree-boolean {
+            color: #0000ff;
+        }
+
+        .tree-null {
+            color: #666;
+        }
+
+        .tree-toggle {
+            cursor: pointer;
+            user-select: none;
+            color: #666;
+        }
+
+        .tree-collapsed::before {
+            content: '▶ ';
+        }
+
+        .tree-expanded::before {
+            content: '▼ ';
+        }
+
+        .features {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .features h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+
+        .feature-item h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .copy-btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-btn {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .view-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .path-display {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #ecf0f1;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .faq {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .faq-item h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>JSON Formatter & Validator</h1>
+            <nav aria-label="breadcrumb">
+                <a href="/" class="nav-link">← Back to Tools</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="tool-description">
+            <h2>Format, Validate, and Transform JSON Data</h2>
+            <p>A powerful JSON tool that formats, validates, beautifies, and minifies JSON data. Features include syntax
+                validation with error messages, tree view visualization, JSON path finder, and conversion between JSON
+                and YAML formats.</p>
+        </div>
+
+        <div class="controls">
+            <button class="primary-btn" onclick="formatJSON()">Format JSON</button>
+            <button class="secondary-btn" onclick="minifyJSON()">Minify</button>
+            <button class="success-btn" onclick="validateJSON()">Validate</button>
+            <button class="secondary-btn" onclick="clearInput()">Clear</button>
+            <button class="secondary-btn" onclick="loadSample()">Load Sample</button>
+            <button class="secondary-btn" onclick="convertToYAML()">Convert to YAML</button>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">Input JSON</h3>
+                    <button class="copy-btn" onclick="copyToClipboard('input')">Copy</button>
+                </div>
+                <textarea id="inputJSON" placeholder='Paste your JSON here...
+
+Example:
+{
+  "name": "John Doe",
+  "age": 30,
+  "email": "john@example.com"
+}'></textarea>
+                <div id="inputStatus" class="status-bar"></div>
+            </div>
+
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">Output</h3>
+                    <div class="format-options">
+                        <label>Indent:</label>
+                        <select class="indent-select" id="indentSize" onchange="formatJSON()">
+                            <option value="2">2 spaces</option>
+                            <option value="4">4 spaces</option>
+                            <option value="\t">Tab</option>
+                        </select>
+                        <div class="view-toggle">
+                            <button class="view-btn active" onclick="switchView('text')">Text</button>
+                            <button class="view-btn" onclick="switchView('tree')">Tree</button>
+                        </div>
+                        <button class="copy-btn" onclick="copyToClipboard('output')">Copy</button>
+                    </div>
+                </div>
+                <textarea id="outputJSON" placeholder="Formatted JSON will appear here..." readonly></textarea>
+                <div id="treeView" class="tree-view"></div>
+                <div id="jsonPath" class="path-display"></div>
+                <div id="outputStatus" class="status-bar"></div>
+            </div>
+        </div>
+
+        <section class="features">
+            <h2>JSON Formatter Features</h2>
+            <div class="features-grid">
+                <article class="feature-item">
+                    <h3>🎨 Format & Beautify JSON</h3>
+                    <p>Automatically format messy JSON with proper indentation and structure. Choose between 2 spaces, 4
+                        spaces, or tab indentation.</p>
+                </article>
+                <article class="feature-item">
+                    <h3>✅ Validate JSON Syntax</h3>
+                    <p>Check JSON syntax with detailed error messages showing exact line and column numbers where errors
+                        occur.</p>
+                </article>
+                <article class="feature-item">
+                    <h3>🗜️ Minify JSON Data</h3>
+                    <p>Compress JSON by removing unnecessary whitespace for production use. Reduce file size while
+                        maintaining validity.</p>
+                </article>
+                <article class="feature-item">
+                    <h3>🌳 Interactive Tree View</h3>
+                    <p>Visualize JSON structure in an interactive, collapsible tree format. Navigate complex nested data
+                        easily.</p>
+                </article>
+                <article class="feature-item">
+                    <h3>🔄 Convert JSON to YAML</h3>
+                    <p>Transform JSON to YAML format seamlessly. Perfect for configuration files and data migration.</p>
+                </article>
+                <article class="feature-item">
+                    <h3>📋 Copy & Export Options</h3>
+                    <p>One-click copy to clipboard functionality. Export formatted JSON for your development projects.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section class="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <h3>What is JSON?</h3>
+                <p>JSON (JavaScript Object Notation) is a lightweight data-interchange format that's easy for humans to
+                    read and write, and easy for machines to parse and generate.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How do I use this JSON formatter?</h3>
+                <p>Simply paste your JSON data into the input field on the left, and the formatted version will appear
+                    automatically on the right. You can also load sample data or upload a file.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Is my JSON data secure?</h3>
+                <p>Yes! All processing happens directly in your browser. No data is sent to any server, ensuring
+                    complete privacy and security.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 JSON Formatter & Validator. Free online tool for developers.</p>
+            <div class="footer-links">
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
+                <a href="/contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentView = 'text';
+
+        function formatJSON() {
+            const input = document.getElementById('inputJSON').value;
+            const indentSize = document.getElementById('indentSize').value;
+
+            if (!input.trim()) {
+                showStatus('inputStatus', 'Please enter JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const indent = indentSize === '\t' ? '\t' : ' '.repeat(parseInt(indentSize));
+                const formatted = JSON.stringify(parsed, null, indent);
+
+                document.getElementById('outputJSON').value = formatted;
+                showStatus('outputStatus', 'JSON formatted successfully', 'success');
+
+                if (currentView === 'tree') {
+                    renderTreeView(parsed);
+                }
+            } catch (error) {
+                showStatus('inputStatus', `JSON Error: ${error.message}`, 'error');
+                document.getElementById('outputJSON').value = '';
+            }
+        }
+
+        function minifyJSON() {
+            const input = document.getElementById('inputJSON').value;
+
+            if (!input.trim()) {
+                showStatus('inputStatus', 'Please enter JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const minified = JSON.stringify(parsed);
+
+                document.getElementById('outputJSON').value = minified;
+                showStatus('outputStatus', 'JSON minified successfully', 'success');
+            } catch (error) {
+                showStatus('inputStatus', `JSON Error: ${error.message}`, 'error');
+            }
+        }
+
+        function validateJSON() {
+            const input = document.getElementById('inputJSON').value;
+
+            if (!input.trim()) {
+                showStatus('inputStatus', 'Please enter JSON data', 'error');
+                return;
+            }
+
+            try {
+                JSON.parse(input);
+                showStatus('inputStatus', 'Valid JSON! ✓', 'success');
+                showStatus('outputStatus', 'JSON validation passed', 'success');
+            } catch (error) {
+                const match = error.message.match(/position (\d+)/);
+                let errorMsg = `Invalid JSON: ${error.message}`;
+
+                if (match) {
+                    const position = parseInt(match[1]);
+                    const lines = input.substring(0, position).split('\n');
+                    const line = lines.length;
+                    const column = lines[lines.length - 1].length + 1;
+                    errorMsg += ` (Line ${line}, Column ${column})`;
+                }
+
+                showStatus('inputStatus', errorMsg, 'error');
+            }
+        }
+
+        function clearInput() {
+            document.getElementById('inputJSON').value = '';
+            document.getElementById('outputJSON').value = '';
+            document.getElementById('treeView').innerHTML = '';
+            document.getElementById('inputStatus').style.display = 'none';
+            document.getElementById('outputStatus').style.display = 'none';
+        }
+
+        function loadSample() {
+            const sample = {
+                "user": {
+                    "id": 1,
+                    "name": "John Doe",
+                    "email": "john.doe@example.com",
+                    "active": true,
+                    "roles": ["user", "admin"],
+                    "profile": {
+                        "age": 30,
+                        "location": "New York",
+                        "interests": ["coding", "music", "travel"]
+                    }
+                },
+                "settings": {
+                    "theme": "dark",
+                    "notifications": true,
+                    "language": "en"
+                }
+            };
+
+            document.getElementById('inputJSON').value = JSON.stringify(sample, null, 2);
+            formatJSON();
+        }
+
+        function convertToYAML() {
+            const input = document.getElementById('inputJSON').value;
+
+            if (!input.trim()) {
+                showStatus('inputStatus', 'Please enter JSON data', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const yaml = jsonToYaml(parsed);
+                document.getElementById('outputJSON').value = yaml;
+                showStatus('outputStatus', 'Converted to YAML successfully', 'success');
+            } catch (error) {
+                showStatus('inputStatus', `JSON Error: ${error.message}`, 'error');
+            }
+        }
+
+        function jsonToYaml(obj, indent = '') {
+            let yaml = '';
+
+            for (const [key, value] of Object.entries(obj)) {
+                yaml += `${indent}${key}: `;
+
+                if (value === null) {
+                    yaml += 'null\n';
+                } else if (typeof value === 'object' && !Array.isArray(value)) {
+                    yaml += '\n' + jsonToYaml(value, indent + '  ');
+                } else if (Array.isArray(value)) {
+                    yaml += '\n';
+                    value.forEach(item => {
+                        if (typeof item === 'object') {
+                            yaml += `${indent}- \n${jsonToYaml(item, indent + '  ')}`;
+                        } else {
+                            yaml += `${indent}- ${item}\n`;
+                        }
+                    });
+                } else if (typeof value === 'string') {
+                    yaml += `"${value}"\n`;
+                } else {
+                    yaml += `${value}\n`;
+                }
+            }
+
+            return yaml;
+        }
+
+        function copyToClipboard(source) {
+            const textarea = source === 'input' ?
+                document.getElementById('inputJSON') :
+                document.getElementById('outputJSON');
+
+            if (!textarea.value) {
+                showStatus(source === 'input' ? 'inputStatus' : 'outputStatus',
+                    'Nothing to copy', 'error');
+                return;
+            }
+
+            textarea.select();
+            document.execCommand('copy');
+
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+
+        function switchView(view) {
+            currentView = view;
+            const buttons = document.querySelectorAll('.view-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (view === 'text') {
+                document.getElementById('outputJSON').style.display = 'block';
+                document.getElementById('treeView').style.display = 'none';
+            } else {
+                document.getElementById('outputJSON').style.display = 'none';
+                document.getElementById('treeView').style.display = 'block';
+
+                const input = document.getElementById('inputJSON').value;
+                if (input.trim()) {
+                    try {
+                        const parsed = JSON.parse(input);
+                        renderTreeView(parsed);
+                    } catch (error) {
+                        document.getElementById('treeView').innerHTML =
+                            '<span style="color: red;">Invalid JSON</span>';
+                    }
+                }
+            }
+        }
+
+        function renderTreeView(obj, container = null, path = '') {
+            if (!container) {
+                container = document.getElementById('treeView');
+                container.innerHTML = '';
+            }
+
+            const createNode = (key, value, currentPath) => {
+                const node = document.createElement('div');
+                node.className = 'tree-node';
+
+                if (value === null) {
+                    node.innerHTML = `<span class="tree-key">${key}:</span> <span class="tree-null">null</span>`;
+                } else if (typeof value === 'object') {
+                    const isArray = Array.isArray(value);
+                    const toggle = document.createElement('span');
+                    toggle.className = 'tree-toggle tree-expanded';
+                    toggle.onclick = () => toggleNode(toggle, content);
+
+                    const keySpan = document.createElement('span');
+                    keySpan.className = 'tree-key';
+                    keySpan.textContent = key + ':';
+
+                    const brackets = document.createElement('span');
+                    brackets.textContent = isArray ? ' []' : ' {}';
+                    brackets.style.color = '#666';
+
+                    node.appendChild(toggle);
+                    node.appendChild(keySpan);
+                    node.appendChild(brackets);
+
+                    const content = document.createElement('div');
+                    content.style.marginLeft = '20px';
+
+                    if (isArray) {
+                        value.forEach((item, index) => {
+                            createNode(`[${index}]`, item, `${currentPath}[${index}]`);
+                        });
+                    } else {
+                        Object.entries(value).forEach(([k, v]) => {
+                            const childPath = currentPath ? `${currentPath}.${k}` : k;
+                            const childNode = createNode(k, v, childPath);
+                            content.appendChild(childNode);
+                        });
+                    }
+
+                    node.appendChild(content);
+                } else if (typeof value === 'string') {
+                    node.innerHTML = `<span class="tree-key">${key}:</span> <span class="tree-string">"${value}"</span>`;
+                } else if (typeof value === 'number') {
+                    node.innerHTML = `<span class="tree-key">${key}:</span> <span class="tree-number">${value}</span>`;
+                } else if (typeof value === 'boolean') {
+                    node.innerHTML = `<span class="tree-key">${key}:</span> <span class="tree-boolean">${value}</span>`;
+                }
+
+                node.onclick = (e) => {
+                    e.stopPropagation();
+                    showJSONPath(currentPath);
+                };
+
+                return node;
+            };
+
+            if (typeof obj === 'object' && obj !== null) {
+                Object.entries(obj).forEach(([key, value]) => {
+                    const node = createNode(key, value, key);
+                    container.appendChild(node);
+                });
+            } else {
+                container.innerHTML = `<span>${JSON.stringify(obj)}</span>`;
+            }
+        }
+
+        function toggleNode(toggle, content) {
+            if (toggle.classList.contains('tree-expanded')) {
+                toggle.classList.remove('tree-expanded');
+                toggle.classList.add('tree-collapsed');
+                content.style.display = 'none';
+            } else {
+                toggle.classList.remove('tree-collapsed');
+                toggle.classList.add('tree-expanded');
+                content.style.display = 'block';
+            }
+        }
+
+        function showJSONPath(path) {
+            const pathDisplay = document.getElementById('jsonPath');
+            pathDisplay.textContent = `Path: $.${path}`;
+            pathDisplay.style.display = 'block';
+        }
+
+        function showStatus(elementId, message, type) {
+            const statusBar = document.getElementById(elementId);
+            statusBar.textContent = message;
+            statusBar.className = `status-bar ${type}`;
+            statusBar.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusBar.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Auto-format on paste
+        document.getElementById('inputJSON').addEventListener('paste', (e) => {
+            setTimeout(() => {
+                formatJSON();
+            }, 100);
+        });
+
+        // Format on input change with debounce
+        let formatTimeout;
+        document.getElementById('inputJSON').addEventListener('input', () => {
+            clearTimeout(formatTimeout);
+            formatTimeout = setTimeout(() => {
+                const input = document.getElementById('inputJSON').value;
+                if (input.trim()) {
+                    try {
+                        JSON.parse(input);
+                        document.getElementById('inputStatus').style.display = 'none';
+                    } catch (error) {
+                        // Don't show error while typing
+                    }
+                }
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

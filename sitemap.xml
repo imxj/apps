@@ -93,6 +93,27 @@
         <priority>0.8</priority>
     </url>
     
+    <url>
+        <loc>https://imxj.github.io/apps/json-formatter/</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://imxj.github.io/apps/color-palette-generator/</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://imxj.github.io/apps/unit-converter/</loc>
+        <lastmod>2024-12-01</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
     <!-- Blog pages -->
     <url>
         <loc>https://imxj.github.io/apps/blog/</loc>
