@@ -13,9 +13,10 @@
 	</script>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no" />
-	<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"
+		defer></script>
 	<script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"
-		crossorigin="anonymous"></script>
+		crossorigin="anonymous" defer></script>
 	<meta name="keywords"
 		content="passport photo, passport photo maker, free passport photo, online passport photo, webcam passport photo, DIY passport photo" />
 	<meta name="description"
@@ -142,7 +143,7 @@
 			</p>
 		</div>
 		<canvas class="output_canvas step-capture"></canvas>
-		<img class="preview_image step-download" />
+		<img class="preview_image step-download" alt="Generated passport photo grid ready for download" />
 	</div>
 	<div class="controls">
 		<button class="start step-intro" title="Start"></button>

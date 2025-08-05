@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Free online mortgage calculator. Calculate monthly payments, total interest, and payment schedules. Compare different loan scenarios instantly." />
+    <meta name="keywords"
+        content="mortgage calculator, loan calculator, home loan calculator, mortgage payment calculator, interest calculator, amortization calculator" />
+    <meta name="author" content="Small Web Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://imxj.github.io/apps/mortgage-calculator/" />
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Mortgage Calculator - Free Online Home Loan Calculator" />
+    <meta property="og:description"
+        content="Calculate mortgage payments, total interest, and payment schedules. Free online tool for home buyers and refinancers." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://imxj.github.io/apps/mortgage-calculator/" />
+    <meta property="og:site_name" content="Small Web Tools" />
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Mortgage Calculator - Free Online Tool" />
+    <meta name="twitter:description"
+        content="Calculate mortgage payments and total interest. Free home loan calculator for buyers." />
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <title>Mortgage Calculator - Free Online Home Loan Payment Calculator | Small Web Tools</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .calculator {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .inputs,
+        .results {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+        }
+
+        .result-row span:first-child {
+            font-weight: bold;
+        }
+
+        @media (min-width: 768px) {
+            .calculator {
+                flex-direction: row;
+            }
+
+            .inputs,
+            .results {
+                width: 48%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Mortgage Calculator</h1>
+    <div class="calculator">
+        <div class="inputs">
+            <label for="homePrice">Home Price:</label>
+            <input type="number" id="homePrice" value="400000">
+
+            <label for="downPayment">Down Payment (%):</label>
+            <input type="number" id="downPayment" value="20">
+
+            <label for="loanTerm">Loan Term (years):</label>
+            <input type="number" id="loanTerm" value="30">
+
+            <label for="interestRate">Interest Rate (%):</label>
+            <input type="number" id="interestRate" value="6.156" step="0.001">
+
+            <label for="propertyTax">Annual Property Tax (%):</label>
+            <input type="number" id="propertyTax" value="1.2" step="0.1">
+
+            <label for="homeInsurance">Annual Home Insurance:</label>
+            <input type="number" id="homeInsurance" value="1500">
+
+            <label for="otherCosts">Annual Other Costs:</label>
+            <input type="number" id="otherCosts" value="4000">
+
+            <button onclick="calculateMortgage()">Calculate</button>
+        </div>
+        <div class="results">
+            <h2>Results</h2>
+            <div class="result-row">
+                <span>Monthly Payment:</span>
+                <span id="monthlyPayment"></span>
+            </div>
+            <div class="result-row">
+                <span>Loan Amount:</span>
+                <span id="loanAmount"></span>
+            </div>
+            <div class="result-row">
+                <span>Down Payment:</span>
+                <span id="downPaymentAmount"></span>
+            </div>
+            <div class="result-row">
+                <span>Total Interest:</span>
+                <span id="totalInterest"></span>
+            </div>
+            <div class="result-row">
+                <span>Total Out-of-Pocket:</span>
+                <span id="totalOutOfPocket"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateMortgage() {
+            const homePrice = parseFloat(document.getElementById('homePrice').value);
+            const downPaymentPercent = parseFloat(document.getElementById('downPayment').value) / 100;
+            const loanTerm = parseInt(document.getElementById('loanTerm').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100 / 12;
+            const propertyTax = parseFloat(document.getElementById('propertyTax').value) / 100;
+            const homeInsurance = parseFloat(document.getElementById('homeInsurance').value);
+            const otherCosts = parseFloat(document.getElementById('otherCosts').value);
+
+            const loanAmount = homePrice * (1 - downPaymentPercent);
+            const numberOfPayments = loanTerm * 12;
+
+            const monthlyMortgage = loanAmount * (interestRate * Math.pow(1 + interestRate, numberOfPayments)) / (Math.pow(1 + interestRate, numberOfPayments) - 1);
+            const monthlyPropertyTax = (homePrice * propertyTax) / 12;
+            const monthlyHomeInsurance = homeInsurance / 12;
+            const monthlyOtherCosts = otherCosts / 12;
+
+            const totalMonthlyPayment = monthlyMortgage + monthlyPropertyTax + monthlyHomeInsurance + monthlyOtherCosts;
+            const totalInterest = (monthlyMortgage * numberOfPayments) - loanAmount;
+            const totalOutOfPocket = totalMonthlyPayment * numberOfPayments;
+
+            document.getElementById('monthlyPayment').textContent = '$' + totalMonthlyPayment.toFixed(2);
+            document.getElementById('loanAmount').textContent = '$' + loanAmount.toFixed(2);
+            document.getElementById('downPaymentAmount').textContent = '$' + (homePrice * downPaymentPercent).toFixed(2);
+            document.getElementById('totalInterest').textContent = '$' + totalInterest.toFixed(2);
+            document.getElementById('totalOutOfPocket').textContent = '$' + totalOutOfPocket.toFixed(2);
+        }
+
+        // Initial calculation
+        calculateMortgage();
+    </script>
+</body>
+
+</html>
