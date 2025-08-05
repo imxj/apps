@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Master advanced regex patterns with practical examples. Learn email validation, text parsing, lookarounds, and complex pattern matching for real-world development.">
+    <meta name="keywords"
+        content="regex patterns, regular expressions, regex tutorial, advanced regex, regex examples, regex cheat sheet, regex lookahead">
+    <meta name="author" content="Small Web Tools">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://imxj.github.io/apps/blog/posts/advanced-regex-patterns.html">
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Advanced Regex Patterns Every Developer Should Know">
+    <meta property="og:description"
+        content="Comprehensive guide to advanced regular expressions with practical examples and real-world use cases.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://imxj.github.io/apps/blog/posts/advanced-regex-patterns.html">
+    <meta property="og:site_name" content="Small Web Tools">
+    <meta property="article:published_time" content="2024-12-01">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Advanced Regex Patterns for Developers">
+    <meta name="twitter:description"
+        content="Master complex regex patterns with practical examples and detailed explanations.">
+
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+    <title>Advanced Regex Patterns Every Developer Should Know | Small Web Tools</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .breadcrumb a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        .intro-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .pattern-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .pattern-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pattern-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .pattern-category {
+            background-color: #4CAF50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+        }
+
+        .regex-pattern {
+            background-color: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1em;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .explanation {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .example-section {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #ffeaa7;
+        }
+
+        .example-section h4 {
+            margin-top: 0;
+            color: #856404;
+        }
+
+        .match {
+            background-color: #81c784;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .no-match {
+            background-color: #e57373;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .test-cases {
+            margin: 15px 0;
+        }
+
+        .test-case {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .test-input {
+            flex: 1;
+            background-color: #f5f5f5;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+
+        .test-result {
+            font-size: 0.9em;
+        }
+
+        .cta-section {
+            background-color: #4CAF50;
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .cta-section h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: white;
+            color: #4CAF50;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 15px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-reference {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+        .quick-reference h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .reference-item {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #bbdefb;
+        }
+
+        .reference-item code {
+            display: block;
+            color: #1976d2;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .reference-item span {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .warning-box {
+            background-color: #ffebee;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #f44336;
+        }
+
+        .tip-box {
+            background-color: #f3e5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #9c27b0;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .regex-pattern {
+                font-size: 0.9em;
+            }
+
+            .pattern-header {
+                flex-direction: column;
+                align-items: start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <nav class="breadcrumb">
+                <a href="../../">Home</a> → <a href="../">Blog</a> → Advanced Regex Patterns
+            </nav>
+            <h1>Advanced Regex Patterns Every Developer Should Know</h1>
+            <div class="meta">
+                December 1, 2024 • 12 minute read • By Small Web Tools Team
+            </div>
+        </header>
+
+        <div class="intro-section">
+            <p>
+                <strong>Regular expressions are one of the most powerful tools in a developer's toolkit.</strong> While
+                basic patterns like matching digits <code>\d</code> or words <code>\w</code> are essential, mastering
+                advanced regex patterns can dramatically improve your text processing capabilities. This guide covers
+                the most useful advanced patterns with real-world examples and detailed explanations.
+            </p>
+        </div>
+
+        <div class="cta-section">
+            <h3>Test These Patterns Live!</h3>
+            <p>Try out all the regex patterns in this guide using our interactive regex tester</p>
+            <a href="../../regex-tester/" class="cta-button">Open Regex Tester →</a>
+        </div>
+
+        <h2>1. Email Validation Patterns</h2>
+
+        <p>Email validation is one of the most common use cases for regex, but it's also one of the most misunderstood.
+            Let's explore different levels of email validation.</p>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Basic Email Pattern</span>
+                <span class="pattern-category">Validation</span>
+            </div>
+            <div class="regex-pattern">^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$</div>
+            <div class="explanation">
+                <strong>Breakdown:</strong>
+                <ul>
+                    <li><code>^</code> - Start of string</li>
+                    <li><code>[a-zA-Z0-9._%+-]+</code> - Username part (letters, numbers, and common special chars)</li>
+                    <li><code>@</code> - Required @ symbol</li>
+                    <li><code>[a-zA-Z0-9.-]+</code> - Domain name</li>
+                    <li><code>\.</code> - Required dot</li>
+                    <li><code>[a-zA-Z]{2,}</code> - Top-level domain (at least 2 letters)</li>
+                    <li><code>$</code> - End of string</li>
+                </ul>
+            </div>
+            <div class="test-cases">
+                <div class="test-case">
+                    <span class="test-input">user@example.com</span>
+                    <span class="test-result match">✓ Match</span>
+                </div>
+                <div class="test-case">
+                    <span class="test-input">john.doe+filter@company.co.uk</span>
+                    <span class="test-result match">✓ Match</span>
+                </div>
+                <div class="test-case">
+                    <span class="test-input">invalid@.com</span>
+                    <span class="test-result no-match">✗ No Match</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">RFC-Compliant Email Pattern</span>
+                <span class="pattern-category">Advanced Validation</span>
+            </div>
+            <div class="regex-pattern">
+                ^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+            </div>
+            <div class="explanation">
+                This pattern follows RFC 5322 specifications more closely, allowing all valid email formats including
+                special characters and preventing common invalid formats.
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong> While regex can catch many invalid emails, the only way to truly validate an
+            email address is to send a confirmation email. Use regex for basic format checking, not as the sole
+            validation method.
+        </div>
+
+        <h2>2. Password Strength Patterns</h2>
+
+        <p>Creating secure password requirements often involves multiple regex patterns working together.</p>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Strong Password Pattern</span>
+                <span class="pattern-category">Security</span>
+            </div>
+            <div class="regex-pattern">^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$</div>
+            <div class="explanation">
+                <strong>Requirements enforced:</strong>
+                <ul>
+                    <li>At least one lowercase letter: <code>(?=.*[a-z])</code></li>
+                    <li>At least one uppercase letter: <code>(?=.*[A-Z])</code></li>
+                    <li>At least one digit: <code>(?=.*\d)</code></li>
+                    <li>At least one special character: <code>(?=.*[@$!%*?&])</code></li>
+                    <li>Minimum 8 characters: <code>{8,}</code></li>
+                </ul>
+            </div>
+            <div class="test-cases">
+                <div class="test-case">
+                    <span class="test-input">SecureP@ss123</span>
+                    <span class="test-result match">✓ Strong</span>
+                </div>
+                <div class="test-case">
+                    <span class="test-input">weakpass</span>
+                    <span class="test-result no-match">✗ Too Weak</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>3. URL and Domain Patterns</h2>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">URL Validation with Protocol</span>
+                <span class="pattern-category">Web</span>
+            </div>
+            <div class="regex-pattern">
+                ^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$
+            </div>
+            <div class="explanation">
+                Matches URLs starting with http:// or https://, with optional www, domain name, and optional path/query
+                parameters.
+            </div>
+            <div class="example-section">
+                <h4>Matches:</h4>
+                <ul>
+                    <li>https://www.example.com</li>
+                    <li>http://subdomain.site.co.uk/path?query=value</li>
+                    <li>https://localhost:3000/api/users</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Extract Domain from Email/URL</span>
+                <span class="pattern-category">Extraction</span>
+            </div>
+            <div class="regex-pattern">@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})</div>
+            <div class="explanation">
+                Extracts just the domain portion from an email address. The domain is captured in group 1.
+            </div>
+        </div>
+
+        <h2>4. Advanced Lookarounds</h2>
+
+        <p>Lookarounds are zero-width assertions that match a position rather than characters. They're incredibly
+            powerful for complex pattern matching.</p>
+
+        <div class="quick-reference">
+            <h3>Lookaround Quick Reference</h3>
+            <div class="reference-grid">
+                <div class="reference-item">
+                    <code>(?=...)</code>
+                    <span>Positive lookahead</span>
+                </div>
+                <div class="reference-item">
+                    <code>(?!...)</code>
+                    <span>Negative lookahead</span>
+                </div>
+                <div class="reference-item">
+                    <code>(?&lt;=...)</code>
+                    <span>Positive lookbehind</span>
+                </div>
+                <div class="reference-item">
+                    <code>(?&lt;!...)</code>
+                    <span>Negative lookbehind</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Password Without Repeating Characters</span>
+                <span class="pattern-category">Lookaround</span>
+            </div>
+            <div class="regex-pattern">^(?!.*([A-Za-z0-9])\1{2}).*$</div>
+            <div class="explanation">
+                Uses negative lookahead to ensure no character repeats 3 or more times consecutively.
+                <ul>
+                    <li><code>(?!...)</code> - Negative lookahead</li>
+                    <li><code>([A-Za-z0-9])</code> - Capture any alphanumeric character</li>
+                    <li><code>\1{2}</code> - Match the same character 2 more times (3 total)</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>5. Phone Number Patterns</h2>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">International Phone Numbers</span>
+                <span class="pattern-category">Validation</span>
+            </div>
+            <div class="regex-pattern">^\+?[1-9]\d{1,14}$</div>
+            <div class="explanation">
+                E.164 format: Optional + followed by country code and number (max 15 digits total).
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">US Phone Numbers (Flexible)</span>
+                <span class="pattern-category">Validation</span>
+            </div>
+            <div class="regex-pattern">^(\+1|1)?[-.\s]?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})$</div>
+            <div class="explanation">
+                Matches various US phone formats:
+                <ul>
+                    <li>+1-555-123-4567</li>
+                    <li>1 (555) 123-4567</li>
+                    <li>555.123.4567</li>
+                    <li>5551234567</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>6. Data Extraction Patterns</h2>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Extract Prices from Text</span>
+                <span class="pattern-category">Extraction</span>
+            </div>
+            <div class="regex-pattern">\$?\d+(?:,\d{3})*(?:\.\d{2})?</div>
+            <div class="explanation">
+                Matches prices with optional dollar sign, thousands separators, and decimal places.
+            </div>
+            <div class="test-cases">
+                <div class="test-case">
+                    <span class="test-input">The price is $1,234.56</span>
+                    <span class="test-result match">Extracts: $1,234.56</span>
+                </div>
+                <div class="test-case">
+                    <span class="test-input">Only 99.99 today!</span>
+                    <span class="test-result match">Extracts: 99.99</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Extract Hashtags</span>
+                <span class="pattern-category">Social Media</span>
+            </div>
+            <div class="regex-pattern">#[a-zA-Z0-9_]+(?![a-zA-Z0-9_])</div>
+            <div class="explanation">
+                Matches hashtags ensuring they end at word boundaries. The negative lookahead prevents matching partial
+                hashtags.
+            </div>
+        </div>
+
+        <h2>7. Date and Time Patterns</h2>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">ISO 8601 Date Format</span>
+                <span class="pattern-category">DateTime</span>
+            </div>
+            <div class="regex-pattern">^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$</div>
+            <div class="explanation">
+                Matches dates in YYYY-MM-DD format with basic validation:
+                <ul>
+                    <li>Months: 01-12</li>
+                    <li>Days: 01-31 (doesn't validate month-specific limits)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Time with Optional Seconds</span>
+                <span class="pattern-category">DateTime</span>
+            </div>
+            <div class="regex-pattern">^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$</div>
+            <div class="explanation">
+                24-hour time format (HH:MM or HH:MM:SS)
+            </div>
+        </div>
+
+        <h2>8. Advanced Text Processing</h2>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Remove Duplicate Words</span>
+                <span class="pattern-category">Text Cleanup</span>
+            </div>
+            <div class="regex-pattern">\b(\w+)\s+\1\b</div>
+            <div class="explanation">
+                Finds consecutive duplicate words. Replace with <code>$1</code> to keep only one instance.
+            </div>
+            <div class="example-section">
+                <h4>Example:</h4>
+                <p>"The the quick brown brown fox" → "The quick brown fox"</p>
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">CamelCase to snake_case</span>
+                <span class="pattern-category">String Manipulation</span>
+            </div>
+            <div class="regex-pattern">([A-Z])</div>
+            <div class="explanation">
+                Find: <code>([A-Z])</code><br>
+                Replace: <code>_\L$1</code> (in editors supporting case conversion)<br>
+                Then lowercase the entire string.
+            </div>
+        </div>
+
+        <h2>9. HTML/XML Patterns</h2>
+
+        <div class="warning-box">
+            <strong>⚠️ Warning:</strong> While regex can handle simple HTML/XML tasks, use a proper parser for complex
+            HTML manipulation. These patterns are for simple extraction tasks only.
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Extract Tag Content</span>
+                <span class="pattern-category">HTML</span>
+            </div>
+            <div class="regex-pattern">&lt;tag[^&gt;]*&gt;(.*?)&lt;/tag&gt;</div>
+            <div class="explanation">
+                Extract content between specific tags (replace "tag" with actual tag name). Uses lazy quantifier
+                <code>*?</code> to match minimal content.
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Extract All URLs from HTML</span>
+                <span class="pattern-category">HTML</span>
+            </div>
+            <div class="regex-pattern">href=["']([^"']+)["']</div>
+            <div class="explanation">
+                Captures URLs from href attributes. The URL is in capture group 1.
+            </div>
+        </div>
+
+        <h2>10. Advanced Replacement Patterns</h2>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Title Case Conversion</span>
+                <span class="pattern-category">Text Formatting</span>
+            </div>
+            <div class="regex-pattern">\b(\w)(\w*)\b</div>
+            <div class="explanation">
+                Find: <code>\b(\w)(\w*)\b</code><br>
+                Replace: <code>\U$1\L$2</code> (in supporting engines)<br>
+                Capitalizes first letter of each word.
+            </div>
+        </div>
+
+        <div class="pattern-box">
+            <div class="pattern-header">
+                <span class="pattern-name">Add Thousands Separators</span>
+                <span class="pattern-category">Number Formatting</span>
+            </div>
+            <div class="regex-pattern">(\d)(?=(\d{3})+(?!\d))</div>
+            <div class="explanation">
+                Find: <code>(\d)(?=(\d{3})+(?!\d))</code><br>
+                Replace: <code>$1,</code><br>
+                Adds commas to numbers: 1234567 → 1,234,567
+            </div>
+        </div>
+
+        <h2>Performance Tips</h2>
+
+        <div class="tip-box">
+            <h3>🚀 Optimization Guidelines</h3>
+            <ol>
+                <li><strong>Be Specific:</strong> <code>[0-9]</code> is faster than <code>\d</code> in some engines</li>
+                <li><strong>Avoid Backtracking:</strong> Use atomic groups <code>(?&gt;...)</code> when possible</li>
+                <li><strong>Lazy vs Greedy:</strong> Use lazy quantifiers <code>*?</code> when appropriate</li>
+                <li><strong>Anchor When Possible:</strong> Use <code>^</code> and <code>$</code> to limit search space
+                </li>
+                <li><strong>Precompile Patterns:</strong> Store compiled regex objects for reuse</li>
+            </ol>
+        </div>
+
+        <h2>Common Pitfalls to Avoid</h2>
+
+        <div class="warning-box">
+            <h3>❌ Don't Do This:</h3>
+            <ul>
+                <li><strong>Catastrophic Backtracking:</strong> <code>(a+)+b</code> on "aaaaaaaaac"</li>
+                <li><strong>Greedy When Lazy Needed:</strong> <code>&lt;.+&gt;</code> vs <code>&lt;.+?&gt;</code> for
+                    HTML</li>
+                <li><strong>Forgetting to Escape:</strong> <code>.</code> matches any character, use <code>\.</code> for
+                    literal dot</li>
+                <li><strong>Case Sensitivity:</strong> Remember to use <code>i</code> flag when needed</li>
+            </ul>
+        </div>
+
+        <h2>Testing and Debugging</h2>
+
+        <p>When working with complex regex patterns:</p>
+
+        <ol>
+            <li><strong>Start Simple:</strong> Build your pattern incrementally</li>
+            <li><strong>Test Edge Cases:</strong> Empty strings, special characters, boundaries</li>
+            <li><strong>Use Visualization Tools:</strong> Many online tools show pattern matching step-by-step</li>
+            <li><strong>Comment Complex Patterns:</strong> Use <code>(?#comment)</code> or verbose mode</li>
+            <li><strong>Have a Test Suite:</strong> Keep examples of valid and invalid inputs</li>
+        </ol>
+
+        <div class="cta-section">
+            <h3>Practice Makes Perfect!</h3>
+            <p>The best way to master regex is through practice. Try modifying these patterns and testing them with your
+                own data.</p>
+            <a href="../../regex-tester/" class="cta-button">Try Regex Tester →</a>
+        </div>
+
+        <h2>Regex Flavor Differences</h2>
+
+        <p>Different programming languages and tools support different regex features:</p>
+
+        <table class="pattern-box" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>JavaScript</th>
+                    <th>Python</th>
+                    <th>Java</th>
+                    <th>PCRE (PHP)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Lookbehind</td>
+                    <td>ES2018+</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                </tr>
+                <tr>
+                    <td>Named Groups</td>
+                    <td>ES2018+</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                </tr>
+                <tr>
+                    <td>Recursive Patterns</td>
+                    <td>✗</td>
+                    <td>regex module</td>
+                    <td>✗</td>
+                    <td>✓</td>
+                </tr>
+                <tr>
+                    <td>Unicode Properties</td>
+                    <td>ES2018+</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Conclusion</h2>
+
+        <p>
+            Regular expressions are powerful but can become complex quickly. The key to mastery is understanding the
+            building blocks and practicing with real-world examples. Start with simple patterns and gradually
+            incorporate advanced features like lookarounds and backreferences.
+        </p>
+
+        <p>
+            Remember that regex isn't always the best solution. For complex parsing tasks, consider using dedicated
+            parsers. For simple string operations, built-in string methods might be clearer and faster.
+        </p>
+
+        <div class="tip-box">
+            <h3>📚 Keep Learning</h3>
+            <p>Bookmark this guide and our <a href="../../regex-tester/">regex tester</a> for quick reference. Regular
+                expressions are a skill that improves with practice, so keep experimenting with new patterns and use
+                cases.</p>
+        </div>
+
+    </div>
+</body>
+
+</html>

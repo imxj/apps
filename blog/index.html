@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Blog - Tips, tutorials, and guides for using Small Web Tools. Learn how to make the most of our free online tools.">
+    <meta name="keywords" content="web tools blog, online tools tutorials, how to guides, tool tips, productivity blog">
+    <meta name="author" content="Small Web Tools">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://imxj.github.io/apps/blog/">
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Small Web Tools Blog - Tips & Tutorials">
+    <meta property="og:description"
+        content="Learn how to use our free online tools effectively with tutorials, tips, and comprehensive guides.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://imxj.github.io/apps/blog/">
+    <meta property="og:site_name" content="Small Web Tools">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Small Web Tools Blog">
+    <meta name="twitter:description" content="Tips, tutorials, and guides for using our free online tools.">
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <title>Blog - Small Web Tools | Tips, Tutorials & How-To Guides</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 5px;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .navigation-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #4CAF50;
+            text-decoration: none;
+            padding: 6px 15px;
+            border: 1px solid #4CAF50;
+            border-radius: 20px;
+            display: inline-block;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .blog-card h2 {
+            color: #28a745;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .blog-card .meta {
+            color: #999;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .blog-card .excerpt {
+            color: #666;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .blog-card .read-more {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .blog-card .read-more:hover {
+            color: #45a049;
+        }
+
+        .blog-card .read-more::after {
+            content: '→';
+            margin-left: 5px;
+            transition: transform 0.3s;
+        }
+
+        .blog-card .read-more:hover::after {
+            transform: translateX(3px);
+        }
+
+        .blog-card .tags {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .blog-card .tag {
+            background-color: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .search-container {
+            position: relative;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 6px 15px 6px 35px;
+            font-size: 0.9em;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: #4CAF50;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+            display: none;
+        }
+
+        .search-highlight {
+            background-color: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .navigation-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-links a {
+                padding: 5px 12px;
+                font-size: 0.85em;
+            }
+
+            .search-container {
+                width: 100%;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Blog</h1>
+        <p class="subtitle">Tips, Tutorials, and Guides for Our Tools</p>
+    </header>
+
+    <div class="navigation-bar">
+        <nav class="nav-links">
+            <a href="../">← Back</a>
+            <a href="#tutorials">Tutorials</a>
+            <a href="#tips">Tips & Tricks</a>
+            <a href="#comparisons">Comparisons</a>
+        </nav>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-box" placeholder="Search posts..." id="blogSearchInput">
+        </div>
+    </div>
+
+    <div class="no-results" id="noResults">
+        No posts found matching your search.
+    </div>
+
+    <div class="blog-grid">
+        <!-- Blog Post 1 -->
+        <article class="blog-card">
+            <h2>How to Create Perfect Passport Photos at Home</h2>
+            <div class="meta">December 1, 2024 • 8 min read</div>
+            <p class="excerpt">
+                Learn how to create professional passport photos from the comfort of your home. This comprehensive guide
+                covers lighting, background, positioning, and using our free online passport photo tool to get perfect
+                results every time.
+            </p>
+            <a href="posts/perfect-passport-photos.html" class="read-more">Read Full Article</a>
+            <div class="tags">
+                <span class="tag">Tutorial</span>
+                <span class="tag">Passport Photo</span>
+                <span class="tag">Photography</span>
+            </div>
+        </article>
+
+        <!-- Blog Post 2 -->
+        <article class="blog-card">
+            <h2>5 Creative Ways to Use QR Codes for Your Business</h2>
+            <div class="meta">December 1, 2024 • 6 min read</div>
+            <p class="excerpt">
+                Discover innovative ways to leverage QR codes beyond basic links. From contactless menus to customer
+                feedback, interactive business cards to WiFi sharing, learn how QR codes can transform your business
+                operations.
+            </p>
+            <a href="posts/qr-codes-business.html" class="read-more">Read Full Article</a>
+            <div class="tags">
+                <span class="tag">Use Cases</span>
+                <span class="tag">QR Codes</span>
+                <span class="tag">Business</span>
+            </div>
+        </article>
+
+        <!-- Blog Post 3 -->
+        <article class="blog-card">
+            <h2>Online vs Desktop Markdown Editors: Which is Better?</h2>
+            <div class="meta">December 1, 2024 • 10 min read</div>
+            <p class="excerpt">
+                A comprehensive comparison of online and desktop markdown editors. We'll explore the pros and cons of
+                each approach, covering features, accessibility, collaboration, and security to help you make the right
+                choice.
+            </p>
+            <a href="posts/markdown-editor-comparison.html" class="read-more">Read Full Article</a>
+            <div class="tags">
+                <span class="tag">Comparison</span>
+                <span class="tag">Markdown</span>
+                <span class="tag">Productivity</span>
+            </div>
+        </article>
+
+        <!-- Blog Post 4 -->
+        <article class="blog-card">
+            <h2>Advanced Regex Patterns Every Developer Should Know</h2>
+            <div class="meta">December 1, 2024 • 12 min read</div>
+            <p class="excerpt">
+                Master advanced regular expression patterns with practical examples. From email validation to complex
+                text parsing, this guide covers essential regex patterns with detailed explanations and real-world use
+                cases.
+            </p>
+            <a href="posts/advanced-regex-patterns.html" class="read-more">Read Full Article</a>
+            <div class="tags">
+                <span class="tag">Tips & Tricks</span>
+                <span class="tag">Regex</span>
+                <span class="tag">Development</span>
+            </div>
+        </article>
+    </div>
+
+    <script>
+        // Filter and search functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+            const blogCards = document.querySelectorAll('.blog-card');
+            const allLink = document.querySelector('.nav-links a[href="../"]');
+            const searchInput = document.getElementById('blogSearchInput');
+            const noResultsMsg = document.getElementById('noResults');
+
+            // Add "All" link for showing all posts
+            const allPostsLink = document.createElement('a');
+            allPostsLink.href = '#all';
+            allPostsLink.textContent = 'All Posts';
+            allLink.parentNode.insertBefore(allPostsLink, navLinks[0]);
+
+            let currentCategory = 'all';
+            let searchTerm = '';
+
+            // Function to apply both category filter and search
+            function applyFilters() {
+                let visibleCount = 0;
+
+                blogCards.forEach(card => {
+                    const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+                    const title = card.querySelector('h2').textContent.toLowerCase();
+                    const excerpt = card.querySelector('.excerpt').textContent.toLowerCase();
+                    const allText = `${title} ${excerpt} ${tags.join(' ')}`;
+
+                    // Check category filter
+                    let matchesCategory = false;
+                    if (currentCategory === 'all') {
+                        matchesCategory = true;
+                    } else if (currentCategory === 'tutorials' && tags.includes('tutorial')) {
+                        matchesCategory = true;
+                    } else if (currentCategory === 'tips' && tags.includes('tips & tricks')) {
+                        matchesCategory = true;
+                    } else if (currentCategory === 'comparisons' && tags.includes('comparison')) {
+                        matchesCategory = true;
+                    }
+
+                    // Check search term
+                    const matchesSearch = searchTerm === '' || allText.includes(searchTerm.toLowerCase());
+
+                    // Show only if matches both filters
+                    if (matchesCategory && matchesSearch) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Show/hide no results message
+                noResultsMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
+
+            // Function to filter posts by category
+            function filterByCategory(category) {
+                currentCategory = category;
+                applyFilters();
+
+                // Update active link styling
+                document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
+                    link.style.backgroundColor = 'transparent';
+                    link.style.color = '#4CAF50';
+                });
+
+                const activeLink = document.querySelector(`.nav-links a[href="#${category}"]`);
+                if (activeLink) {
+                    activeLink.style.backgroundColor = '#4CAF50';
+                    activeLink.style.color = 'white';
+                }
+            }
+
+            // Handle search input
+            searchInput.addEventListener('input', function () {
+                searchTerm = this.value.trim();
+                applyFilters();
+            });
+
+            // Clear search when focusing
+            searchInput.addEventListener('focus', function () {
+                this.select();
+            });
+
+            // Handle navigation clicks
+            document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const category = this.getAttribute('href').substring(1);
+                    filterByCategory(category);
+
+                    // Update URL without page reload
+                    history.pushState(null, null, `#${category}`);
+                });
+            });
+
+            // Handle initial load with hash
+            const hash = window.location.hash.substring(1);
+            if (hash && ['tutorials', 'tips', 'comparisons', 'all'].includes(hash)) {
+                filterByCategory(hash);
+            } else {
+                // Show all posts by default
+                filterByCategory('all');
+            }
+
+            // Handle browser back/forward
+            window.addEventListener('popstate', function () {
+                const hash = window.location.hash.substring(1);
+                if (hash && ['tutorials', 'tips', 'comparisons', 'all'].includes(hash)) {
+                    filterByCategory(hash);
+                } else {
+                    filterByCategory('all');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
