@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
@@ -12,8 +13,31 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="QR, code, generator, online, free, browser" />
-    <title>QR Code Generator</title>
+    <meta name="description"
+        content="Free online QR code generator. Create QR codes for URLs, WiFi, SMS, phone numbers, emails, and more. Download QR codes instantly - no registration required." />
+    <meta name="keywords"
+        content="QR code generator, free QR code, online QR code generator, WiFi QR code, URL QR code, SMS QR code, QR code maker" />
+    <meta name="author" content="Small Web Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://imxj.github.io/apps/qr-code-generator/" />
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="QR Code Generator - Free Online QR Code Maker" />
+    <meta property="og:description"
+        content="Create QR codes for URLs, WiFi, SMS, phone numbers, emails, and more. Free online tool with instant download." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://imxj.github.io/apps/qr-code-generator/" />
+    <meta property="og:site_name" content="Small Web Tools" />
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="QR Code Generator - Free Online Tool" />
+    <meta name="twitter:description"
+        content="Create QR codes instantly for URLs, WiFi, SMS, and more. Free online QR code generator." />
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <title>QR Code Generator - Free Online QR Code Maker | Small Web Tools</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
@@ -24,15 +48,18 @@
             display: flex;
             gap: 20px;
         }
+
         .left-panel {
             flex: 3;
         }
+
         .right-panel {
             flex: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         .options {
             display: flex;
             flex-wrap: wrap;
@@ -42,6 +69,7 @@
             padding: 10px;
             border-radius: 5px;
         }
+
         .option {
             padding: 10px 15px;
             border: 1px solid #ccc;
@@ -49,17 +77,22 @@
             cursor: pointer;
             background-color: white;
         }
+
         .option.selected {
             border-color: #4CAF50;
             color: #4CAF50;
         }
-        input, textarea, select {
+
+        input,
+        textarea,
+        select {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+
         button {
             background-color: #28a745;
             color: white;
@@ -69,38 +102,45 @@
             cursor: pointer;
             margin-top: 10px;
         }
+
         button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
+
         #qrcode {
             background-color: white;
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: center;
             align-items: center;
         }
+
         .download-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
             width: 100%;
         }
+
         .download-buttons button {
             flex: 1;
         }
+
         .wifi-hidden-option {
             display: flex;
             align-items: center;
             gap: 5px;
         }
+
         .tooltip {
             position: relative;
             display: inline-block;
             cursor: pointer;
         }
+
         .tooltip .tooltiptext {
             visibility: hidden;
             width: 200px;
@@ -111,20 +151,25 @@
             padding: 5px;
             position: absolute;
             z-index: 1;
-            bottom: 125%; /* Position above the element */
+            bottom: 125%;
+            /* Position above the element */
             left: 50%;
-            margin-left: -100px; /* Center the tooltip */
+            margin-left: -100px;
+            /* Center the tooltip */
             opacity: 0;
             transition: opacity 0.3s;
         }
+
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
         }
+
         .tooltip .tooltiptext::after {
             content: "";
             position: absolute;
-            top: 100%; /* Arrow at the bottom */
+            top: 100%;
+            /* Arrow at the bottom */
             left: 50%;
             margin-left: -5px;
             border-width: 5px;
@@ -133,6 +178,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="left-panel">
         <div class="options">
@@ -173,7 +219,7 @@
             let html = '';
             let descriptionText = '';
 
-            switch(type) {
+            switch (type) {
                 case 'link':
                     html = `
                         <h3>Submit URL</h3>
@@ -249,7 +295,7 @@
             const qrcodeElement = document.getElementById('qrcode');
             qrcodeElement.innerHTML = '';
             let data = '';
-            switch(currentType) {
+            switch (currentType) {
                 case 'link':
                     data = document.getElementById('url').value;
                     break;
@@ -265,7 +311,7 @@
                 case 'tel':
                     data = `tel:${document.getElementById('tel').value}`;
                     break;
-               
+
                 case 'sms':
                     const smsNumber = document.getElementById('smsNumber').value;
                     const smsBody = document.getElementById('smsBody').value;
@@ -301,7 +347,7 @@
         }
 
         document.querySelectorAll('.option').forEach(option => {
-            option.addEventListener('click', function() {
+            option.addEventListener('click', function () {
                 document.querySelector('.option.selected').classList.remove('selected');
                 this.classList.add('selected');
                 currentType = this.dataset.type;
@@ -311,7 +357,7 @@
 
         document.getElementById('generate').addEventListener('click', generateQRCode);
 
-        document.getElementById('downloadPNG').addEventListener('click', function() {
+        document.getElementById('downloadPNG').addEventListener('click', function () {
             if (qrcode) {
                 const dataUrl = qrcode._el.querySelector('img').src;
                 const link = document.createElement('a');
@@ -320,52 +366,52 @@
                 link.click();
             }
         });
-     
- function generateSVG(data) {
-  // Create SVG data for the QR code
-  const qrCode = new QRCode(document.createElement('div'), {
-    text: data,
-    width: 256,
-    height: 256
-  });
 
-  // Extract the QR code's modules
-  const canvas = qrCode._el.querySelector('canvas');
-  const size = canvas.width;
-  const ctx = canvas.getContext('2d');
-  const imageData = ctx.getImageData(0, 0, size, size);
+        function generateSVG(data) {
+            // Create SVG data for the QR code
+            const qrCode = new QRCode(document.createElement('div'), {
+                text: data,
+                width: 256,
+                height: 256
+            });
 
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+            // Extract the QR code's modules
+            const canvas = qrCode._el.querySelector('canvas');
+            const size = canvas.width;
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, size, size);
 
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const index = (y * size + x) * 4;
-      const r = imageData.data[index];
-      const g = imageData.data[index + 1];
-      const b = imageData.data[index + 2];
+            let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
 
-      // Check if the pixel is black (or very dark)
-      if (r < 50 && g < 50 && b < 50) { 
-        svg += `<rect x="${x}" y="${y}" width="1" height="1" fill="#000" />`;
-      }
-    }
-  }
-  svg += '</svg>';
-  return svg;
-}
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const index = (y * size + x) * 4;
+                    const r = imageData.data[index];
+                    const g = imageData.data[index + 1];
+                    const b = imageData.data[index + 2];
 
-document.getElementById('downloadSVG').addEventListener('click', function() {
-    if (lastQRCodeData) {
-        const svgData = generateSVG(lastQRCodeData);
-        const blob = new Blob([svgData], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = 'qrcode.svg';
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
-    }
-});
+                    // Check if the pixel is black (or very dark)
+                    if (r < 50 && g < 50 && b < 50) {
+                        svg += `<rect x="${x}" y="${y}" width="1" height="1" fill="#000" />`;
+                    }
+                }
+            }
+            svg += '</svg>';
+            return svg;
+        }
+
+        document.getElementById('downloadSVG').addEventListener('click', function () {
+            if (lastQRCodeData) {
+                const svgData = generateSVG(lastQRCodeData);
+                const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'qrcode.svg';
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+        });
 
 
         // Initialize with link input fields
@@ -379,4 +425,5 @@ document.getElementById('downloadSVG').addEventListener('click', function() {
         document.getElementById('downloadSVG').disabled = true;
     </script>
 </body>
+
 </html>

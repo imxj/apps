@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
     <script>
@@ -10,8 +11,31 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="web, quick, easy, transcript, speech recognition, free, browser" />
-    <title>Easy Transcript</title>
+    <meta name="description"
+        content="Free online transcription tool with real-time speech recognition. Convert speech to text instantly in your browser. No downloads or uploads required." />
+    <meta name="keywords"
+        content="speech to text, transcription tool, voice to text, online transcription, speech recognition, audio transcription, free transcription" />
+    <meta name="author" content="Small Web Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://imxj.github.io/apps/easy-transcript/" />
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Easy Transcript - Free Online Speech to Text Tool" />
+    <meta property="og:description"
+        content="Convert speech to text instantly with real-time transcription. Free online tool using advanced speech recognition." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://imxj.github.io/apps/easy-transcript/" />
+    <meta property="og:site_name" content="Small Web Tools" />
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Easy Transcript - Speech to Text Tool" />
+    <meta name="twitter:description"
+        content="Free online transcription with real-time speech recognition. Convert voice to text instantly." />
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <title>Easy Transcript - Free Online Speech to Text Transcription | Small Web Tools</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,9 +52,12 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-            max-height: 300px; /* Set a max height to allow scrolling */
-            overflow-y: auto; /* Add vertical scroll if the content overflows */
-            border: 1px solid #ccc; /* Add border for better visibility */
+            max-height: 300px;
+            /* Set a max height to allow scrolling */
+            overflow-y: auto;
+            /* Add vertical scroll if the content overflows */
+            border: 1px solid #ccc;
+            /* Add border for better visibility */
         }
 
         #transcript {
@@ -38,8 +65,10 @@
             font-size: 1.2em;
             overflow-wrap: break-word;
             word-wrap: break-word;
-            white-space: pre-wrap; /* Maintain line breaks */
-            text-align: left; /* Align text to the left */
+            white-space: pre-wrap;
+            /* Maintain line breaks */
+            text-align: left;
+            /* Align text to the left */
         }
 
         .button-container {
@@ -78,8 +107,10 @@
             button {
                 padding: 10px 15px;
                 font-size: 1em;
-                flex: 1; /* Allows buttons to resize and fit in a row */
-                min-width: 90px; /* Minimum width to keep the button legible */
+                flex: 1;
+                /* Allows buttons to resize and fit in a row */
+                min-width: 90px;
+                /* Minimum width to keep the button legible */
             }
         }
 
@@ -91,6 +122,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Easy Transcript</h1>
     <button id="start-btn">Start</button>
@@ -99,7 +131,7 @@
     <button id="play-audio-btn" disabled>Play Audio</button>
     <button id="download-audio-btn" disabled>Download Audio</button>
 
-    
+
     <div id="transcript-container">
         <div id="transcript">Transcript will appear here...</div>
     </div>
@@ -190,7 +222,7 @@
                     stopBtn.disabled = true;
                     emailBtn.disabled = false; // Enable the email button
                     playAudioBtn.disabled = false; // Enable the play audio button
-                    downloadAudioBtn.disabled = false; 
+                    downloadAudioBtn.disabled = false;
                     transcriptDiv.textContent += ' (Stopped Listening)';
                     // Export audio using Recorder.js
                     recorder.stop();
@@ -228,88 +260,88 @@
             });
 
             // Concatenate multiple WAV blobs into a single WAV Blob
-        function concatenateWavBlobs(blobs) {
-            return new Promise((resolve, reject) => {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const totalBuffers = [];
-                
-                // Decode all blobs to AudioBuffers
-                const decodePromises = blobs.map(blob => {
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => {
-                            audioContext.decodeAudioData(reader.result, resolve, reject);
-                        };
-                        reader.onerror = reject;
-                        reader.readAsArrayBuffer(blob);
+            function concatenateWavBlobs(blobs) {
+                return new Promise((resolve, reject) => {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const totalBuffers = [];
+
+                    // Decode all blobs to AudioBuffers
+                    const decodePromises = blobs.map(blob => {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                audioContext.decodeAudioData(reader.result, resolve, reject);
+                            };
+                            reader.onerror = reject;
+                            reader.readAsArrayBuffer(blob);
+                        });
                     });
+
+                    // When all blobs are decoded, concatenate them
+                    Promise.all(decodePromises).then(buffers => {
+                        const totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
+                        const outputBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
+                        let offset = 0;
+
+                        buffers.forEach(buffer => {
+                            outputBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
+                            offset += buffer.length;
+                        });
+
+                        // Convert the concatenated buffer to a WAV Blob
+                        const wavBlob = audioBufferToWavBlob(outputBuffer);
+                        resolve(wavBlob);
+                    }).catch(reject);
                 });
-
-                // When all blobs are decoded, concatenate them
-                Promise.all(decodePromises).then(buffers => {
-                    const totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
-                    const outputBuffer = audioContext.createBuffer(1, totalLength, audioContext.sampleRate);
-                    let offset = 0;
-
-                    buffers.forEach(buffer => {
-                        outputBuffer.getChannelData(0).set(buffer.getChannelData(0), offset);
-                        offset += buffer.length;
-                    });
-
-                    // Convert the concatenated buffer to a WAV Blob
-                    const wavBlob = audioBufferToWavBlob(outputBuffer);
-                    resolve(wavBlob);
-                }).catch(reject);
-            });
-        }
-
-        // Convert AudioBuffer to WAV Blob
-        function audioBufferToWavBlob(buffer) {
-            const numberOfChannels = buffer.numberOfChannels;
-            const length = buffer.length * numberOfChannels * 2 + 44;
-            const result = new DataView(new ArrayBuffer(length));
-            const channels = [];
-            let offset = 0;
-            let pos = 0;
-
-            // Write WAV header
-            writeString(result, pos, 'RIFF'); pos += 4;
-            result.setUint32(pos, length - 8, true); pos += 4;
-            writeString(result, pos, 'WAVE'); pos += 4;
-            writeString(result, pos, 'fmt '); pos += 4;
-            result.setUint32(pos, 16, true); pos += 4;
-            result.setUint16(pos, 1, true); pos += 2;
-            result.setUint16(pos, numberOfChannels, true); pos += 2;
-            result.setUint32(pos, buffer.sampleRate, true); pos += 4;
-            result.setUint32(pos, buffer.sampleRate * 4, true); pos += 4;
-            result.setUint16(pos, numberOfChannels * 2, true); pos += 2;
-            result.setUint16(pos, 16, true); pos += 2;
-            writeString(result, pos, 'data'); pos += 4;
-            result.setUint32(pos, length - pos - 4, true); pos += 4;
-
-            // Write interleaved data
-            for (let i = 0; i < buffer.numberOfChannels; i++) {
-                channels.push(buffer.getChannelData(i));
             }
-            while (pos < length) {
-                for (let i = 0; i < numberOfChannels; i++) {
-                    const sample = Math.max(-1, Math.min(1, channels[i][offset])); // Clamp
-                    result.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-                    pos += 2;
+
+            // Convert AudioBuffer to WAV Blob
+            function audioBufferToWavBlob(buffer) {
+                const numberOfChannels = buffer.numberOfChannels;
+                const length = buffer.length * numberOfChannels * 2 + 44;
+                const result = new DataView(new ArrayBuffer(length));
+                const channels = [];
+                let offset = 0;
+                let pos = 0;
+
+                // Write WAV header
+                writeString(result, pos, 'RIFF'); pos += 4;
+                result.setUint32(pos, length - 8, true); pos += 4;
+                writeString(result, pos, 'WAVE'); pos += 4;
+                writeString(result, pos, 'fmt '); pos += 4;
+                result.setUint32(pos, 16, true); pos += 4;
+                result.setUint16(pos, 1, true); pos += 2;
+                result.setUint16(pos, numberOfChannels, true); pos += 2;
+                result.setUint32(pos, buffer.sampleRate, true); pos += 4;
+                result.setUint32(pos, buffer.sampleRate * 4, true); pos += 4;
+                result.setUint16(pos, numberOfChannels * 2, true); pos += 2;
+                result.setUint16(pos, 16, true); pos += 2;
+                writeString(result, pos, 'data'); pos += 4;
+                result.setUint32(pos, length - pos - 4, true); pos += 4;
+
+                // Write interleaved data
+                for (let i = 0; i < buffer.numberOfChannels; i++) {
+                    channels.push(buffer.getChannelData(i));
                 }
-                offset++;
+                while (pos < length) {
+                    for (let i = 0; i < numberOfChannels; i++) {
+                        const sample = Math.max(-1, Math.min(1, channels[i][offset])); // Clamp
+                        result.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                        pos += 2;
+                    }
+                    offset++;
+                }
+
+                // Create a Blob for the WAV file
+                return new Blob([result], { type: 'audio/wav' });
             }
 
-            // Create a Blob for the WAV file
-            return new Blob([result], { type: 'audio/wav' });
-        }
-
-        // Utility function to write strings to DataView
-        function writeString(view, offset, string) {
-            for (let i = 0; i < string.length; i++) {
-                view.setUint8(offset + i, string.charCodeAt(i));
+            // Utility function to write strings to DataView
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
             }
-        }
 
             // Process the results
             recognition.onresult = (event) => {
@@ -353,4 +385,5 @@
         });
     </script>
 </body>
+
 </html>

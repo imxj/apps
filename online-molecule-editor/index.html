@@ -1,12 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Molecule Editor</title>
+    <meta name="description"
+        content="Free online molecule editor and viewer. Draw, edit, and visualize chemical structures in your browser. Import/export SMILES, MOL files, and more." />
+    <meta name="keywords"
+        content="molecule editor, chemical structure editor, SMILES editor, molecular drawing tool, chemistry editor, online molecule viewer" />
+    <meta name="author" content="Small Web Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://imxj.github.io/apps/online-molecule-editor/" />
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="Online Molecule Editor - Free Chemical Structure Drawing Tool" />
+    <meta property="og:description"
+        content="Draw and edit chemical structures online. Free molecule editor with SMILES support and file import/export." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://imxj.github.io/apps/online-molecule-editor/" />
+    <meta property="og:site_name" content="Small Web Tools" />
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Online Molecule Editor - Chemical Drawing Tool" />
+    <meta name="twitter:description"
+        content="Free online tool to draw and edit chemical structures. Supports SMILES and MOL files." />
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <title>Online Molecule Editor - Free Chemical Structure Drawing Tool | Small Web Tools</title>
     <script src="openchemlib-minimal.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/kekule/dist/themes/default/kekule.css" />
-<script src="https://cdn.jsdelivr.net/npm/kekule/dist/kekule.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/kekule/dist/themes/default/kekule.css" />
+    <script src="https://cdn.jsdelivr.net/npm/kekule/dist/kekule.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,21 +47,26 @@
             margin: 0 auto;
             padding: 20px;
         }
+
         #molecule-editor {
             width: 600px;
             height: 400px;
             border: 1px solid #ccc;
         }
-        #smiles-input, #smiles-output {
+
+        #smiles-input,
+        #smiles-output {
             width: 100%;
             margin-top: 10px;
         }
+
         button {
             margin: 5px;
             padding: 5px 10px;
         }
     </style>
 </head>
+
 <body>
     <h1>Online Molecule Editor</h1>
     <div>
@@ -42,13 +80,13 @@
         <input type="text" id="smiles-output" readonly>
     </div>
 
-   
+
     <script>
         let OCL;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initialize OpenChemLib
             OCL = window.OCL;
-            
+
             const editor = new Kekule.Editor.Composer(document.getElementById('molecule-editor'));
             const smilesInput = document.getElementById('smiles-input');
             const smilesOutput = document.getElementById('smiles-output');
@@ -75,14 +113,14 @@
                 try {
                     // Get the molecule from Kekule.js editor
                     const kekuleMol = editor.getChemObj();
-                    
+
                     // Convert to molfile
                     const molfile = Kekule.IO.saveFormatData(kekuleMol, 'mol');
-                    
+
                     // Use OpenChemLib to convert molfile to SMILES
                     const mol = OCL.Molecule.fromMolfile(molfile);
                     const smiles = mol.toSmiles();
-                    
+
                     smilesOutput.value = smiles;
                 } catch (error) {
                     alert('Error generating SMILES. Please check your molecule.');
@@ -92,4 +130,5 @@
         });
     </script>
 </body>
+
 </html>

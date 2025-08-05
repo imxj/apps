@@ -1,0 +1,9 @@
+# Robots.txt for Small Web Tools
+# Allow all web crawlers
+
+User-agent: *
+Allow: /
+Disallow: /tab-organizer/
+
+# Sitemap location
+Sitemap: https://imxj.github.io/apps/sitemap.xml 

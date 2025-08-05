@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
@@ -12,9 +13,33 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="SVG, PNG, Converter, image format, online, free, browser" />
-    <title>SVG to PNG Converter</title>
+    <meta name="description"
+        content="Convert SVG files to PNG format online. Free SVG to PNG converter with customizable resolution options. No uploads required - works in your browser." />
+    <meta name="keywords"
+        content="SVG to PNG, SVG converter, PNG converter, convert SVG to PNG, online SVG converter, free SVG to PNG converter" />
+    <meta name="author" content="Small Web Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://imxj.github.io/apps/svg-to-png/" />
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="SVG to PNG Converter - Free Online Image Converter" />
+    <meta property="og:description"
+        content="Convert SVG files to PNG format instantly. Free online tool with customizable resolution options." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://imxj.github.io/apps/svg-to-png/" />
+    <meta property="og:site_name" content="Small Web Tools" />
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="SVG to PNG Converter - Free Online Tool" />
+    <meta name="twitter:description"
+        content="Convert SVG files to PNG format instantly with customizable resolution options." />
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+    <title>SVG to PNG Converter - Free Online SVG to PNG Conversion | Small Web Tools</title>
 </head>
+
 <body>
     <h2>SVG to PNG Converter</h2>
     <input type="file" id="svgInput" accept="image/svg+xml">
@@ -29,7 +54,9 @@
     <button onclick="convertSVG()">Convert and Download</button>
     <br><br>
     <span id="downloadLinks"></span>
-    <div id="svgDisplay" style="width: 100%; max-width: 1000px; height: auto; transform: scale(0.5); transform-origin: top left; overflow: hidden;"></div>
+    <div id="svgDisplay"
+        style="width: 100%; max-width: 1000px; height: auto; transform: scale(0.5); transform-origin: top left; overflow: hidden;">
+    </div>
     <canvas id="canvas" style="display:none;"></canvas>
 
     <script>
@@ -69,7 +96,7 @@
 
                 const canvas = document.getElementById('canvas');
                 const ctx = canvas.getContext('2d');
-                
+
                 canvas.width = resolution;
                 canvas.height = resolution;
 
@@ -107,4 +134,5 @@
         }
     </script>
 </body>
+
 </html>
