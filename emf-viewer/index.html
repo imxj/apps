@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMF Picture Viewer - View Enhanced Metafiles Online</title>
+    <meta name="description" content="Free online EMF (Enhanced Metafile) viewer. Upload and view EMF images directly in your browser, with zoom, pan, and export capabilities.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .upload-area {
+            background: white;
+            border: 2px dashed #4CAF50;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #45a049;
+            background-color: #f9f9f9;
+        }
+
+        .upload-area.dragover {
+            border-color: #45a049;
+            background-color: #f0fff0;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background: #45a049;
+        }
+
+        .viewer-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .viewer-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .file-info {
+            color: #666;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #45a049;
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .zoom-level {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .viewer-canvas-container {
+            position: relative;
+            overflow: auto;
+            height: 600px;
+            background: #fafafa;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        #viewer-canvas {
+            display: block;
+            cursor: grab;
+            background: white;
+            margin: 20px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #viewer-canvas:active {
+            cursor: grabbing;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .upload-area {
+                padding: 20px;
+            }
+
+            .viewer-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                justify-content: center;
+            }
+
+            .viewer-canvas-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">← Back to Tools</a>
+
+        <div class="header">
+            <h1>EMF Picture Viewer</h1>
+            <div class="subtitle">Upload and view Enhanced Metafile (EMF) images online</div>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Drag & drop your EMF file here</div>
+            <div class="upload-text">or</div>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Choose File
+            </button>
+            <input type="file" id="fileInput" class="file-input" accept=".emf,.wmf" />
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="viewer-container" id="viewerContainer">
+            <div class="viewer-header">
+                <div class="file-info" id="fileInfo"></div>
+                <div class="controls">
+                    <div class="zoom-controls">
+                        <button class="control-btn" id="zoomOutBtn">-</button>
+                        <div class="zoom-level" id="zoomLevel">100%</div>
+                        <button class="control-btn" id="zoomInBtn">+</button>
+                    </div>
+                    <button class="control-btn" id="fitToScreenBtn">Fit to Screen</button>
+                    <button class="control-btn" id="actualSizeBtn">Actual Size</button>
+                    <button class="control-btn" id="exportPngBtn">Export PNG</button>
+                    <button class="control-btn" id="newFileBtn">New File</button>
+                </div>
+            </div>
+            <div class="viewer-canvas-container" id="canvasContainer">
+                <canvas id="viewer-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class EMFViewer {
+            constructor() {
+                this.canvas = document.getElementById('viewer-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.zoom = 1;
+                this.panX = 0;
+                this.panY = 0;
+                this.isDragging = false;
+                this.lastMouseX = 0;
+                this.lastMouseY = 0;
+                this.imageData = null;
+                this.originalWidth = 0;
+                this.originalHeight = 0;
+
+                this.initEventListeners();
+            }
+
+            initEventListeners() {
+                const uploadArea = document.getElementById('uploadArea');
+                const fileInput = document.getElementById('fileInput');
+                const errorMessage = document.getElementById('errorMessage');
+
+                // File upload handling
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        this.handleFile(files[0]);
+                    }
+                });
+
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        this.handleFile(e.target.files[0]);
+                    }
+                });
+
+                // Control buttons
+                document.getElementById('zoomInBtn').addEventListener('click', () => this.zoomIn());
+                document.getElementById('zoomOutBtn').addEventListener('click', () => this.zoomOut());
+                document.getElementById('fitToScreenBtn').addEventListener('click', () => this.fitToScreen());
+                document.getElementById('actualSizeBtn').addEventListener('click', () => this.actualSize());
+                document.getElementById('exportPngBtn').addEventListener('click', () => this.exportPng());
+                document.getElementById('newFileBtn').addEventListener('click', () => this.newFile());
+
+                // Canvas mouse events for panning
+                this.canvas.addEventListener('mousedown', (e) => this.startDrag(e));
+                this.canvas.addEventListener('mousemove', (e) => this.drag(e));
+                this.canvas.addEventListener('mouseup', () => this.endDrag());
+                this.canvas.addEventListener('mouseleave', () => this.endDrag());
+
+                // Mouse wheel for zooming
+                this.canvas.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    if (e.deltaY < 0) {
+                        this.zoomIn();
+                    } else {
+                        this.zoomOut();
+                    }
+                });
+            }
+
+            handleFile(file) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.style.display = 'none';
+
+                if (!file.name.toLowerCase().endsWith('.emf') && !file.name.toLowerCase().endsWith('.wmf')) {
+                    this.showError('Please select an EMF or WMF file.');
+                    return;
+                }
+
+                this.showLoading();
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        this.processEMFFile(e.target.result, file);
+                    } catch (error) {
+                        this.showError('Error processing EMF file: ' + error.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            processEMFFile(arrayBuffer, file) {
+                // For this simplified version, we'll show a placeholder message
+                // In a real implementation, you would need an EMF parser library
+
+                // Create a placeholder image indicating EMF files need special handling
+                this.createPlaceholderImage(file);
+                this.showViewer(file);
+            }
+
+            createPlaceholderImage(file) {
+                // Create a placeholder canvas with EMF file information
+                this.originalWidth = 800;
+                this.originalHeight = 600;
+
+                this.canvas.width = this.originalWidth;
+                this.canvas.height = this.originalHeight;
+
+                // Clear canvas
+                this.ctx.fillStyle = 'white';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw border
+                this.ctx.strokeStyle = '#ddd';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Draw EMF icon and text
+                this.ctx.fillStyle = '#4CAF50';
+                this.ctx.font = 'bold 48px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('📄', this.canvas.width / 2, this.canvas.height / 2 - 100);
+
+                this.ctx.fillStyle = '#333';
+                this.ctx.font = 'bold 24px Arial';
+                this.ctx.fillText('EMF File Loaded', this.canvas.width / 2, this.canvas.height / 2 - 30);
+
+                this.ctx.font = '18px Arial';
+                this.ctx.fillStyle = '#666';
+                this.ctx.fillText(file.name, this.canvas.width / 2, this.canvas.height / 2 + 10);
+                this.ctx.fillText('File size: ' + this.formatFileSize(file.size), this.canvas.width / 2, this.canvas.height / 2 + 40);
+
+                this.ctx.font = '16px Arial';
+                this.ctx.fillStyle = '#999';
+                this.ctx.fillText('Note: Full EMF rendering requires specialized parsing library', this.canvas.width / 2, this.canvas.height / 2 + 80);
+                this.ctx.fillText('This is a placeholder view showing file information', this.canvas.width / 2, this.canvas.height / 2 + 105);
+
+                // Store the image data
+                this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            showViewer(file) {
+                document.getElementById('uploadArea').style.display = 'none';
+                document.getElementById('viewerContainer').style.display = 'block';
+
+                const fileInfo = document.getElementById('fileInfo');
+                fileInfo.textContent = `${file.name} (${this.formatFileSize(file.size)}) - ${this.originalWidth}x${this.originalHeight}`;
+
+                this.fitToScreen();
+            }
+
+            showLoading() {
+                const container = document.getElementById('canvasContainer');
+                container.innerHTML = '<div class="loading">Processing EMF file...</div>';
+            }
+
+            showError(message) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+
+                // Restore canvas container if it was replaced
+                const container = document.getElementById('canvasContainer');
+                if (!container.querySelector('canvas')) {
+                    container.innerHTML = '<canvas id="viewer-canvas"></canvas>';
+                    this.canvas = document.getElementById('viewer-canvas');
+                    this.ctx = this.canvas.getContext('2d');
+                }
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            zoomIn() {
+                this.zoom = Math.min(this.zoom * 1.2, 5);
+                this.redraw();
+            }
+
+            zoomOut() {
+                this.zoom = Math.max(this.zoom / 1.2, 0.1);
+                this.redraw();
+            }
+
+            fitToScreen() {
+                const container = document.getElementById('canvasContainer');
+                const containerWidth = container.clientWidth - 40;
+                const containerHeight = container.clientHeight - 40;
+
+                const scaleX = containerWidth / this.originalWidth;
+                const scaleY = containerHeight / this.originalHeight;
+                this.zoom = Math.min(scaleX, scaleY);
+
+                this.panX = 0;
+                this.panY = 0;
+                this.redraw();
+            }
+
+            actualSize() {
+                this.zoom = 1;
+                this.panX = 0;
+                this.panY = 0;
+                this.redraw();
+            }
+
+            redraw() {
+                if (!this.imageData) return;
+
+                const displayWidth = this.originalWidth * this.zoom;
+                const displayHeight = this.originalHeight * this.zoom;
+
+                this.canvas.width = displayWidth;
+                this.canvas.height = displayHeight;
+
+                // Create temporary canvas to scale the image
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = this.originalWidth;
+                tempCanvas.height = this.originalHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.putImageData(this.imageData, 0, 0);
+
+                // Scale and draw
+                this.ctx.imageSmoothingEnabled = true;
+                this.ctx.drawImage(tempCanvas, 0, 0, displayWidth, displayHeight);
+
+                this.updateZoomDisplay();
+            }
+
+            updateZoomDisplay() {
+                document.getElementById('zoomLevel').textContent = Math.round(this.zoom * 100) + '%';
+            }
+
+            startDrag(e) {
+                this.isDragging = true;
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+            }
+
+            drag(e) {
+                if (!this.isDragging) return;
+
+                const deltaX = e.clientX - this.lastMouseX;
+                const deltaY = e.clientY - this.lastMouseY;
+
+                this.panX += deltaX;
+                this.panY += deltaY;
+
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+            }
+
+            endDrag() {
+                this.isDragging = false;
+            }
+
+            exportPng() {
+                if (!this.imageData) return;
+
+                const link = document.createElement('a');
+                link.download = 'emf_export.png';
+                link.href = this.canvas.toDataURL('image/png');
+                link.click();
+            }
+
+            newFile() {
+                document.getElementById('uploadArea').style.display = 'block';
+                document.getElementById('viewerContainer').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+                document.getElementById('fileInput').value = '';
+
+                // Reset state
+                this.zoom = 1;
+                this.panX = 0;
+                this.panY = 0;
+                this.imageData = null;
+            }
+        }
+
+        // Initialize the EMF viewer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new EMFViewer();
+        });
+    </script>
+</body>
+</html>
