@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Base Converter - Binary, Decimal, Hex, Octal</title>
+    <meta name="description" content="Convert numbers between binary, decimal, hexadecimal, and octal. Free online base converter tool.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #58a6ff; }
+        .converter-box {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .converter-box label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .converter-box .base-name { font-weight: 600; color: #58a6ff; }
+        .converter-box .base-info { font-size: 0.85rem; color: #8b949e; }
+        .converter-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #30363d;
+            border-radius: 8px;
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Monaco', monospace;
+            font-size: 1.1rem;
+        }
+        .converter-box input:focus { outline: none; border-color: #58a6ff; }
+        .converter-box input.error { border-color: #f85149; }
+        .copy-btn {
+            padding: 5px 12px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 5px;
+            color: #c9d1d9;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover { background: #30363d; }
+        .info {
+            text-align: center;
+            padding: 20px;
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Number Base Converter</h1>
+        
+        <div class="converter-box">
+            <label>
+                <span class="base-name">Binary (Base 2)</span>
+                <span class="base-info">0-1</span>
+                <button class="copy-btn" onclick="copy('binary')">Copy</button>
+            </label>
+            <input type="text" id="binary" placeholder="e.g., 1010" oninput="convert('binary')">
+        </div>
+        
+        <div class="converter-box">
+            <label>
+                <span class="base-name">Octal (Base 8)</span>
+                <span class="base-info">0-7</span>
+                <button class="copy-btn" onclick="copy('octal')">Copy</button>
+            </label>
+            <input type="text" id="octal" placeholder="e.g., 12" oninput="convert('octal')">
+        </div>
+        
+        <div class="converter-box">
+            <label>
+                <span class="base-name">Decimal (Base 10)</span>
+                <span class="base-info">0-9</span>
+                <button class="copy-btn" onclick="copy('decimal')">Copy</button>
+            </label>
+            <input type="text" id="decimal" placeholder="e.g., 10" oninput="convert('decimal')">
+        </div>
+        
+        <div class="converter-box">
+            <label>
+                <span class="base-name">Hexadecimal (Base 16)</span>
+                <span class="base-info">0-9, A-F</span>
+                <button class="copy-btn" onclick="copy('hex')">Copy</button>
+            </label>
+            <input type="text" id="hex" placeholder="e.g., A" oninput="convert('hex')">
+        </div>
+        
+        <div class="info">Enter a number in any field to convert</div>
+    </div>
+    <script>
+        const bases = { binary: 2, octal: 8, decimal: 10, hex: 16 };
+        const patterns = {
+            binary: /^[01]+$/,
+            octal: /^[0-7]+$/,
+            decimal: /^[0-9]+$/,
+            hex: /^[0-9a-fA-F]+$/
+        };
+        
+        function convert(source) {
+            const input = document.getElementById(source).value.trim();
+            
+            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+            
+            if (!input) {
+                Object.keys(bases).forEach(id => {
+                    if (id !== source) document.getElementById(id).value = '';
+                });
+                return;
+            }
+            
+            if (!patterns[source].test(input)) {
+                document.getElementById(source).classList.add('error');
+                return;
+            }
+            
+            const decimal = parseInt(input, bases[source]);
+            
+            if (isNaN(decimal)) {
+                document.getElementById(source).classList.add('error');
+                return;
+            }
+            
+            Object.entries(bases).forEach(([id, base]) => {
+                if (id !== source) {
+                    document.getElementById(id).value = decimal.toString(base).toUpperCase();
+                }
+            });
+        }
+        
+        function copy(id) {
+            navigator.clipboard.writeText(document.getElementById(id).value);
+        }
+    </script>
+</body>
+</html>

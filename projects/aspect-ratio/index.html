@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspect Ratio Calculator - Calculate Image & Video Dimensions</title>
+    <meta name="description" content="Calculate aspect ratios and scale dimensions proportionally. Perfect for designers, photographers, and video editors.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; text-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .input-group input:focus { outline: none; border-color: #ff6b6b; }
+        .separator { font-size: 2rem; color: #ccc; }
+        .ratio-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .ratio-display .ratio { font-size: 2.5rem; font-weight: 700; }
+        .ratio-display .decimal { font-size: 1rem; opacity: 0.9; margin-top: 5px; }
+        .presets { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        .preset {
+            padding: 8px 15px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .preset:hover { background: #ff6b6b; color: white; }
+        .lock-group { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .lock-group input[type="checkbox"] { width: 20px; height: 20px; }
+        .preview {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📐 Aspect Ratio Calculator</h1>
+        <div class="card">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Width</label>
+                    <input type="number" id="width" value="1920" oninput="calculate('width')">
+                </div>
+                <span class="separator">×</span>
+                <div class="input-group">
+                    <label>Height</label>
+                    <input type="number" id="height" value="1080" oninput="calculate('height')">
+                </div>
+            </div>
+            <div class="ratio-display">
+                <div class="ratio" id="ratio">16:9</div>
+                <div class="decimal" id="decimal">1.778</div>
+            </div>
+            <div class="presets">
+                <button class="preset" onclick="setRatio(1,1)">1:1</button>
+                <button class="preset" onclick="setRatio(4,3)">4:3</button>
+                <button class="preset" onclick="setRatio(16,9)">16:9</button>
+                <button class="preset" onclick="setRatio(21,9)">21:9</button>
+                <button class="preset" onclick="setRatio(9,16)">9:16</button>
+                <button class="preset" onclick="setRatio(3,2)">3:2</button>
+                <button class="preset" onclick="setRatio(2,3)">2:3</button>
+            </div>
+            <div class="lock-group">
+                <input type="checkbox" id="lockRatio" checked>
+                <label for="lockRatio">Lock aspect ratio when changing dimensions</label>
+            </div>
+            <div class="preview">
+                <div class="preview-box" id="previewBox"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentRatio = 16/9;
+        
+        function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+        
+        function calculate(changed) {
+            const w = parseInt(document.getElementById('width').value) || 1;
+            const h = parseInt(document.getElementById('height').value) || 1;
+            const locked = document.getElementById('lockRatio').checked;
+            
+            if (locked && changed) {
+                if (changed === 'width') {
+                    document.getElementById('height').value = Math.round(w / currentRatio);
+                } else {
+                    document.getElementById('width').value = Math.round(h * currentRatio);
+                }
+            }
+            
+            const newW = parseInt(document.getElementById('width').value);
+            const newH = parseInt(document.getElementById('height').value);
+            currentRatio = newW / newH;
+            
+            const g = gcd(newW, newH);
+            document.getElementById('ratio').textContent = `${newW/g}:${newH/g}`;
+            document.getElementById('decimal').textContent = currentRatio.toFixed(3);
+            
+            updatePreview(newW, newH);
+        }
+        
+        function setRatio(w, h) {
+            currentRatio = w / h;
+            const currentW = parseInt(document.getElementById('width').value);
+            document.getElementById('height').value = Math.round(currentW / currentRatio);
+            calculate();
+        }
+        
+        function updatePreview(w, h) {
+            const box = document.getElementById('previewBox');
+            const maxSize = 150;
+            let pw, ph;
+            if (w > h) {
+                pw = maxSize;
+                ph = maxSize * (h/w);
+            } else {
+                ph = maxSize;
+                pw = maxSize * (w/h);
+            }
+            box.style.width = pw + 'px';
+            box.style.height = ph + 'px';
+        }
+        
+        calculate();
+    </script>
+</body>
+</html>
