@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Counter - Character & Text Statistics</title>
+    <meta name="description" content="Count words, characters, sentences, paragraphs, and reading time. Free online text statistics tool.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1.8;
+            resize: vertical;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        textarea:focus {
+            outline: 3px solid rgba(102, 126, 234, 0.5);
+        }
+        .extras {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .extra-card {
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .extra-card h3 {
+            font-size: 0.9rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .extra-card ul {
+            list-style: none;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        .extra-card li {
+            padding: 3px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .keyword { 
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin: 2px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Word Counter</h1>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number" id="words">0</div>
+                <div class="label">Words</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="chars">0</div>
+                <div class="label">Characters</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="charsNoSpace">0</div>
+                <div class="label">No Spaces</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="sentences">0</div>
+                <div class="label">Sentences</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="paragraphs">0</div>
+                <div class="label">Paragraphs</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="readTime">0</div>
+                <div class="label">Min Read</div>
+            </div>
+        </div>
+        <textarea id="text" placeholder="Start typing or paste your text here..." oninput="analyze()"></textarea>
+        <div class="extras">
+            <div class="extra-card">
+                <h3>📈 Density</h3>
+                <ul id="density"></ul>
+            </div>
+            <div class="extra-card">
+                <h3>🔤 Top Words</h3>
+                <div id="topWords"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function analyze() {
+            const text = document.getElementById('text').value;
+            
+            // Basic counts
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            const charsNoSpace = text.replace(/\s/g, '').length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim()).length;
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim()).length;
+            const readTime = Math.ceil(words / 200);
+            
+            document.getElementById('words').textContent = words;
+            document.getElementById('chars').textContent = chars;
+            document.getElementById('charsNoSpace').textContent = charsNoSpace;
+            document.getElementById('sentences').textContent = sentences;
+            document.getElementById('paragraphs').textContent = paragraphs || (text.trim() ? 1 : 0);
+            document.getElementById('readTime').textContent = readTime;
+            
+            // Density
+            const letters = (text.match(/[a-zA-Z]/g) || []).length;
+            const numbers = (text.match(/[0-9]/g) || []).length;
+            const spaces = (text.match(/\s/g) || []).length;
+            const special = charsNoSpace - letters - numbers;
+            
+            document.getElementById('density').innerHTML = chars ? `
+                <li><span>Letters</span><span>${Math.round(letters/chars*100)}%</span></li>
+                <li><span>Numbers</span><span>${Math.round(numbers/chars*100)}%</span></li>
+                <li><span>Spaces</span><span>${Math.round(spaces/chars*100)}%</span></li>
+                <li><span>Special</span><span>${Math.round(special/chars*100)}%</span></li>
+            ` : '<li>No text yet</li>';
+            
+            // Top words
+            const wordList = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+            const freq = {};
+            wordList.forEach(w => freq[w] = (freq[w] || 0) + 1);
+            const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 8);
+            
+            document.getElementById('topWords').innerHTML = sorted.length 
+                ? sorted.map(([w, c]) => `<span class="keyword">${w} (${c})</span>`).join('')
+                : 'No words yet';
+        }
+        
+        analyze();
+    </script>
+</body>
+</html>

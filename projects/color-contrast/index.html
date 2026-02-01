@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Contrast Checker - WCAG Accessibility</title>
+    <meta name="description" content="Check color contrast ratios for WCAG accessibility compliance. Test foreground and background color combinations.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #333; }
+        .preview {
+            padding: 60px 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .preview h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        .preview p { font-size: 1.1rem; max-width: 500px; margin: 0 auto; }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .color-picker {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .color-picker label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #555;
+        }
+        .color-picker input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .color-picker input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        .ratio-display {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .ratio {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .wcag-results {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .wcag-item {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .wcag-item.pass { background: #d4edda; color: #155724; }
+        .wcag-item.fail { background: #f8d7da; color: #721c24; }
+        .wcag-item .level { font-weight: 700; font-size: 1.1rem; }
+        .wcag-item .desc { font-size: 0.85rem; margin-top: 5px; opacity: 0.8; }
+        .swap-btn {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 10px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .swap-btn:hover { background: #5a6fd6; }
+        @media (max-width: 600px) {
+            .controls { grid-template-columns: 1fr; }
+            .wcag-results { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Color Contrast Checker</h1>
+        <div class="preview" id="preview">
+            <h2>Sample Text</h2>
+            <p>The quick brown fox jumps over the lazy dog. Check if this text is readable!</p>
+        </div>
+        <button class="swap-btn" onclick="swapColors()">⇄ Swap Colors</button>
+        <div class="controls">
+            <div class="color-picker">
+                <label>Foreground (Text)</label>
+                <input type="color" id="fg" value="#000000" oninput="updateFromPicker('fg')">
+                <input type="text" id="fgHex" value="#000000" oninput="updateFromHex('fg')" placeholder="#000000">
+            </div>
+            <div class="color-picker">
+                <label>Background</label>
+                <input type="color" id="bg" value="#ffffff" oninput="updateFromPicker('bg')">
+                <input type="text" id="bgHex" value="#ffffff" oninput="updateFromHex('bg')" placeholder="#ffffff">
+            </div>
+        </div>
+        <div class="ratio-display">
+            <div class="ratio" id="ratio">21:1</div>
+            <div class="wcag-results" id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        function getLuminance(hex) {
+            const rgb = hexToRgb(hex);
+            const [r, g, b] = rgb.map(c => {
+                c = c / 255;
+                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+        
+        function hexToRgb(hex) {
+            hex = hex.replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            return [
+                parseInt(hex.substr(0, 2), 16),
+                parseInt(hex.substr(2, 2), 16),
+                parseInt(hex.substr(4, 2), 16)
+            ];
+        }
+        
+        function getContrastRatio(fg, bg) {
+            const l1 = getLuminance(fg);
+            const l2 = getLuminance(bg);
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+        
+        function update() {
+            const fg = document.getElementById('fg').value;
+            const bg = document.getElementById('bg').value;
+            const ratio = getContrastRatio(fg, bg);
+            
+            document.getElementById('preview').style.color = fg;
+            document.getElementById('preview').style.backgroundColor = bg;
+            document.getElementById('ratio').textContent = ratio.toFixed(2) + ':1';
+            
+            const results = document.getElementById('results');
+            results.innerHTML = `
+                <div class="wcag-item ${ratio >= 4.5 ? 'pass' : 'fail'}">
+                    <div class="level">${ratio >= 4.5 ? '✓' : '✗'} AA Normal</div>
+                    <div class="desc">4.5:1 required</div>
+                </div>
+                <div class="wcag-item ${ratio >= 3 ? 'pass' : 'fail'}">
+                    <div class="level">${ratio >= 3 ? '✓' : '✗'} AA Large</div>
+                    <div class="desc">3:1 required</div>
+                </div>
+                <div class="wcag-item ${ratio >= 7 ? 'pass' : 'fail'}">
+                    <div class="level">${ratio >= 7 ? '✓' : '✗'} AAA Normal</div>
+                    <div class="desc">7:1 required</div>
+                </div>
+                <div class="wcag-item ${ratio >= 4.5 ? 'pass' : 'fail'}">
+                    <div class="level">${ratio >= 4.5 ? '✓' : '✗'} AAA Large</div>
+                    <div class="desc">4.5:1 required</div>
+                </div>
+            `;
+        }
+        
+        function updateFromPicker(which) {
+            const val = document.getElementById(which).value;
+            document.getElementById(which + 'Hex').value = val;
+            update();
+        }
+        
+        function updateFromHex(which) {
+            let val = document.getElementById(which + 'Hex').value;
+            if (!val.startsWith('#')) val = '#' + val;
+            if (/^#[0-9A-Fa-f]{6}$/.test(val) || /^#[0-9A-Fa-f]{3}$/.test(val)) {
+                document.getElementById(which).value = val.length === 4 
+                    ? '#' + val[1]+val[1]+val[2]+val[2]+val[3]+val[3] 
+                    : val;
+                update();
+            }
+        }
+        
+        function swapColors() {
+            const fg = document.getElementById('fg').value;
+            const bg = document.getElementById('bg').value;
+            document.getElementById('fg').value = bg;
+            document.getElementById('bg').value = fg;
+            document.getElementById('fgHex').value = bg;
+            document.getElementById('bgHex').value = fg;
+            update();
+        }
+        
+        update();
+    </script>
+</body>
+</html>
