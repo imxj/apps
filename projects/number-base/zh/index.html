@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进制转换器 - 二进制十进制十六进制</title>
+    <meta name="description" content="免费在线进制转换工具，支持二进制、八进制、十进制、十六进制相互转换。程序员必备。">
+    <meta name="keywords" content="进制转换,二进制转换,十六进制,八进制,十进制转换">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #58a6ff; }
+        .converter-box { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .converter-box label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .converter-box .base-name { font-weight: 600; color: #58a6ff; }
+        .converter-box .base-info { font-size: 0.85rem; color: #8b949e; }
+        .converter-box input { width: 100%; padding: 15px; border: 2px solid #30363d; border-radius: 8px; background: #0d1117; color: #c9d1d9; font-family: monospace; font-size: 1.1rem; }
+        .converter-box input:focus { outline: none; border-color: #58a6ff; }
+        .converter-box input.error { border-color: #f85149; }
+        .copy-btn { padding: 5px 12px; background: #21262d; border: 1px solid #30363d; border-radius: 5px; color: #c9d1d9; cursor: pointer; }
+        .info { text-align: center; padding: 20px; color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 进制转换器</h1>
+        <div class="converter-box"><label><span class="base-name">二进制 (2进制)</span><span class="base-info">0-1</span><button class="copy-btn" onclick="copy('binary')">复制</button></label><input type="text" id="binary" placeholder="例如: 1010" oninput="convert('binary')"></div>
+        <div class="converter-box"><label><span class="base-name">八进制 (8进制)</span><span class="base-info">0-7</span><button class="copy-btn" onclick="copy('octal')">复制</button></label><input type="text" id="octal" placeholder="例如: 12" oninput="convert('octal')"></div>
+        <div class="converter-box"><label><span class="base-name">十进制 (10进制)</span><span class="base-info">0-9</span><button class="copy-btn" onclick="copy('decimal')">复制</button></label><input type="text" id="decimal" placeholder="例如: 10" oninput="convert('decimal')"></div>
+        <div class="converter-box"><label><span class="base-name">十六进制 (16进制)</span><span class="base-info">0-9, A-F</span><button class="copy-btn" onclick="copy('hex')">复制</button></label><input type="text" id="hex" placeholder="例如: A" oninput="convert('hex')"></div>
+        <div class="info">在任意输入框输入数字即可转换</div>
+    </div>
+    <script>
+        const bases = {binary:2,octal:8,decimal:10,hex:16}, patterns = {binary:/^[01]+$/,octal:/^[0-7]+$/,decimal:/^[0-9]+$/,hex:/^[0-9a-fA-F]+$/};
+        function convert(src) {
+            const input = document.getElementById(src).value.trim();
+            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+            if (!input) { Object.keys(bases).forEach(id => { if(id!==src) document.getElementById(id).value=''; }); return; }
+            if (!patterns[src].test(input)) { document.getElementById(src).classList.add('error'); return; }
+            const dec = parseInt(input, bases[src]);
+            if (isNaN(dec)) { document.getElementById(src).classList.add('error'); return; }
+            Object.entries(bases).forEach(([id,base]) => { if(id!==src) document.getElementById(id).value = dec.toString(base).toUpperCase(); });
+        }
+        function copy(id) { navigator.clipboard.writeText(document.getElementById(id).value); }
+    </script>
+</body>
+</html>

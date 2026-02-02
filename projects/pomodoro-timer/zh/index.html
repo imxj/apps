@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番茄钟 - 在线专注计时器 | 提高工作效率</title>
+    <meta name="description" content="免费在线番茄钟计时器，25分钟专注工作，5分钟休息。提高工作效率和专注力的最佳工具。">
+    <meta name="keywords" content="番茄钟,番茄工作法,专注计时器,在线计时器,提高效率,时间管理">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.5s ease;
+        }
+        body.work { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        body.break { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        body.long-break { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .container { text-align: center; color: white; padding: 20px; }
+        h1 { font-size: 1.5rem; margin-bottom: 10px; opacity: 0.9; font-weight: 500; }
+        .timer { font-size: 8rem; font-weight: 200; letter-spacing: -5px; margin: 20px 0; text-shadow: 2px 2px 20px rgba(0,0,0,0.2); }
+        .status { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.8; }
+        .controls { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        button {
+            padding: 15px 40px; font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.1); color: white; border-radius: 50px;
+            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);
+        }
+        button:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+        button.primary { background: rgba(255,255,255,0.25); border-color: white; }
+        .sessions { margin-top: 40px; display: flex; gap: 10px; justify-content: center; }
+        .session-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: background 0.3s; }
+        .session-dot.completed { background: white; }
+        .settings { margin-top: 30px; opacity: 0.7; font-size: 0.9rem; }
+        .settings span { margin: 0 10px; cursor: pointer; }
+        .settings span:hover { opacity: 1; text-decoration: underline; }
+        @media (max-width: 500px) { .timer { font-size: 5rem; } button { padding: 12px 30px; } }
+    </style>
+</head>
+<body class="work">
+    <div class="container">
+        <h1>🍅 番茄钟</h1>
+        <div class="status" id="status">准备好专注了吗？</div>
+        <div class="timer" id="timer">25:00</div>
+        <div class="controls">
+            <button id="startBtn" class="primary" onclick="toggleTimer()">开始</button>
+            <button onclick="resetTimer()">重置</button>
+            <button onclick="skipPhase()">跳过</button>
+        </div>
+        <div class="sessions" id="sessions">
+            <div class="session-dot"></div><div class="session-dot"></div>
+            <div class="session-dot"></div><div class="session-dot"></div>
+        </div>
+        <div class="settings">
+            <span onclick="setCustomTime(25)">25分钟</span> |
+            <span onclick="setCustomTime(50)">50分钟</span> |
+            <span onclick="setCustomTime(90)">90分钟</span>
+        </div>
+    </div>
+    <script>
+        let workTime = 25 * 60, breakTime = 5 * 60, longBreakTime = 15 * 60;
+        let timeLeft = workTime, isRunning = false, isWorkPhase = true, sessionsCompleted = 0, interval = null;
+        const timerEl = document.getElementById('timer'), statusEl = document.getElementById('status'), startBtn = document.getElementById('startBtn'), sessionsEl = document.getElementById('sessions');
+        function formatTime(s) { const m = Math.floor(s/60), sec = s%60; return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`; }
+        function updateDisplay() { timerEl.textContent = formatTime(timeLeft); document.title = `${formatTime(timeLeft)} - ${isWorkPhase ? '专注' : '休息'}`; }
+        function toggleTimer() {
+            if (isRunning) { clearInterval(interval); startBtn.textContent = '继续'; statusEl.textContent = '已暂停'; }
+            else { interval = setInterval(tick, 1000); startBtn.textContent = '暂停'; statusEl.textContent = isWorkPhase ? '💪 专注时间！' : '☕ 休息一下！'; }
+            isRunning = !isRunning;
+        }
+        function tick() {
+            timeLeft--; updateDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(interval); isRunning = false; playSound();
+                if (isWorkPhase) {
+                    sessionsCompleted++; updateSessionDots();
+                    if (sessionsCompleted % 4 === 0) { timeLeft = longBreakTime; document.body.className = 'long-break'; statusEl.textContent = '🎉 长休息！干得好！'; }
+                    else { timeLeft = breakTime; document.body.className = 'break'; statusEl.textContent = '☕ 短休息！'; }
+                } else { timeLeft = workTime; document.body.className = 'work'; statusEl.textContent = '准备下一轮？'; }
+                isWorkPhase = !isWorkPhase; startBtn.textContent = '开始'; updateDisplay();
+            }
+        }
+        function resetTimer() { clearInterval(interval); isRunning = false; isWorkPhase = true; timeLeft = workTime; document.body.className = 'work'; statusEl.textContent = '准备好专注了吗？'; startBtn.textContent = '开始'; updateDisplay(); }
+        function skipPhase() { timeLeft = 1; if (!isRunning) tick(); }
+        function setCustomTime(m) { workTime = m * 60; if (isWorkPhase && !isRunning) { timeLeft = workTime; updateDisplay(); } }
+        function updateSessionDots() { sessionsEl.querySelectorAll('.session-dot').forEach((d,i) => d.classList.toggle('completed', i < (sessionsCompleted % 4))); }
+        function playSound() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(), osc = ctx.createOscillator(), gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 800; gain.gain.setValueAtTime(0.3, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5); osc.start(); osc.stop(ctx.currentTime + 0.5); } catch(e){} }
+        updateDisplay();
+    </script>
+</body>
+</html>

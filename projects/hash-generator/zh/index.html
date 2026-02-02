@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哈希生成器 - 在线SHA256/MD5加密</title>
+    <meta name="description" content="免费在线哈希生成器，支持SHA-256、SHA-512、SHA-1等多种哈希算法，快速生成文本哈希值。">
+    <meta name="keywords" content="哈希生成器,SHA256,SHA512,MD5,在线加密,哈希值">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #0c0c0c, #1a1a2e); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #00ff88; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 2px solid #333; border-radius: 10px; background: #111; color: white; font-size: 16px; margin-bottom: 20px; }
+        textarea:focus { outline: none; border-color: #00ff88; }
+        .hash-results { display: flex; flex-direction: column; gap: 15px; }
+        .hash-row { background: #111; border: 1px solid #333; border-radius: 10px; padding: 15px; display: flex; align-items: center; gap: 15px; }
+        .hash-label { min-width: 80px; font-weight: 600; color: #00ff88; }
+        .hash-value { flex: 1; font-family: monospace; font-size: 0.9rem; word-break: break-all; color: #ccc; }
+        .copy-btn { padding: 8px 15px; background: #00ff88; color: #0c0c0c; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
+        .copy-btn:hover { background: #00cc6a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 哈希生成器</h1>
+        <textarea id="input" placeholder="输入要生成哈希的文本..." oninput="generateHashes()"></textarea>
+        <div class="hash-results" id="results"></div>
+    </div>
+    <script>
+        async function sha(algo, text) { const data = new TextEncoder().encode(text); const hash = await crypto.subtle.digest(algo, data); return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join(''); }
+        async function generateHashes() {
+            const text = document.getElementById('input').value, results = document.getElementById('results');
+            if (!text) { results.innerHTML = '<div class="hash-row" style="color:#666">在上方输入文本以生成哈希值</div>'; return; }
+            const hashes = [{name:'SHA-256',algo:'SHA-256'},{name:'SHA-384',algo:'SHA-384'},{name:'SHA-512',algo:'SHA-512'},{name:'SHA-1',algo:'SHA-1'}];
+            let html = '';
+            for (const h of hashes) { const hash = await sha(h.algo, text); html += `<div class="hash-row"><span class="hash-label">${h.name}</span><span class="hash-value" id="${h.algo}">${hash}</span><button class="copy-btn" onclick="copy('${h.algo}')">复制</button></div>`; }
+            results.innerHTML = html;
+        }
+        function copy(id) { navigator.clipboard.writeText(document.getElementById(id).textContent); }
+        generateHashes();
+    </script>
+</body>
+</html>

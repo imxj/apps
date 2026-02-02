@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL编码解码工具 - 在线URL转换</title>
+    <meta name="description" content="免费在线URL编码解码工具，将中文和特殊字符转换为URL安全格式，或解码URL编码的文本。">
+    <meta name="keywords" content="URL编码,URL解码,在线编码,URL转换,中文URL编码">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #4b6cb7, #182848); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; }
+        .box { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; position: relative; }
+        .box label { display: block; font-weight: 600; margin-bottom: 10px; color: #333; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-family: monospace; font-size: 14px; resize: vertical; }
+        textarea:focus { outline: none; border-color: #4b6cb7; }
+        .buttons { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        button { padding: 15px 40px; border: none; border-radius: 30px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .encode-btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .decode-btn { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+        .swap-btn { background: #f0f0f0; color: #333; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; padding: 8px 15px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 URL编码解码工具</h1>
+        <div class="box"><label>输入（普通文本或已编码URL）</label><button class="copy-btn" onclick="copy('input')">复制</button><textarea id="input" placeholder="输入要编码或解码的文本..."></textarea></div>
+        <div class="buttons">
+            <button class="encode-btn" onclick="encode()">编码 →</button>
+            <button class="swap-btn" onclick="swap()">⇅ 交换</button>
+            <button class="decode-btn" onclick="decode()">← 解码</button>
+        </div>
+        <div class="box"><label>输出</label><button class="copy-btn" onclick="copy('output')">复制</button><textarea id="output" readonly placeholder="结果将显示在这里..."></textarea></div>
+    </div>
+    <script>
+        function encode() { document.getElementById('output').value = encodeURIComponent(document.getElementById('input').value); }
+        function decode() { try { document.getElementById('output').value = decodeURIComponent(document.getElementById('input').value); } catch(e) { document.getElementById('output').value = '错误：无效的编码字符串'; } }
+        function swap() { const i = document.getElementById('input'), o = document.getElementById('output'); [i.value, o.value] = [o.value, i.value]; }
+        function copy(id) { navigator.clipboard.writeText(document.getElementById(id).value); }
+    </script>
+</body>
+</html>

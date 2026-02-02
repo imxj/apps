@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>占位文本生成器 - 中文Lorem Ipsum</title>
+    <meta name="description" content="免费在线中文占位文本生成器，生成设计稿所需的假文本。支持自定义段落、句子数量。">
+    <meta name="keywords" content="占位文本,Lorem Ipsum,假文本,设计稿文本,中文假字">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #f093fb, #f5576c); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; text-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+        .controls { background: white; padding: 25px; border-radius: 16px; margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; justify-content: center; }
+        .control-group { display: flex; align-items: center; gap: 10px; }
+        select, input[type="number"] { padding: 10px 15px; border: 2px solid #eee; border-radius: 8px; font-size: 1rem; }
+        input[type="number"] { width: 80px; }
+        button { padding: 12px 30px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border: none; border-radius: 25px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .output { background: white; padding: 30px; border-radius: 16px; position: relative; }
+        .output-text { line-height: 1.8; color: #333; max-height: 500px; overflow-y: auto; }
+        .copy-btn { position: absolute; top: 15px; right: 15px; padding: 8px 20px; background: #333; color: white; border: none; border-radius: 20px; cursor: pointer; }
+        p { margin-bottom: 1em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📜 占位文本生成器</h1>
+        <div class="controls">
+            <div class="control-group"><label>生成</label><input type="number" id="count" value="3" min="1" max="100"></div>
+            <div class="control-group">
+                <select id="type">
+                    <option value="paragraphs">段落</option>
+                    <option value="sentences">句子</option>
+                    <option value="words">词语</option>
+                </select>
+            </div>
+            <button onclick="generate()">生成</button>
+        </div>
+        <div class="output"><button class="copy-btn" onclick="copy()">复制</button><div class="output-text" id="output"></div></div>
+    </div>
+    <script>
+        const words = ["天地","玄黄","宇宙","洪荒","日月","盈昃","辰宿","列张","寒来","暑往","秋收","冬藏","闰余","成岁","律吕","调阳","云腾","致雨","露结","为霜","金生","丽水","玉出","昆冈","剑号","巨阙","珠称","夜光","果珍","李奈","菜重","芥姜","海咸","河淡","鳞潜","羽翔","龙师","火帝","鸟官","人皇","始制","文字","乃服","衣裳","推位","让国","有虞","陶唐","吊民","伐罪","周发","殷汤","坐朝","问道","垂拱","平章","爱育","黎首","臣伏","戎羌","遐迩","一体","率宾","归王"];
+        function randomWord() { return words[Math.floor(Math.random()*words.length)]; }
+        function randomSentence() { return Array(6+Math.floor(Math.random()*6)).fill(0).map(randomWord).join('')+'。'; }
+        function randomParagraph() { return Array(3+Math.floor(Math.random()*3)).fill(0).map(randomSentence).join(''); }
+        function generate() {
+            const count = parseInt(document.getElementById('count').value), type = document.getElementById('type').value;
+            let result = '';
+            if (type==='paragraphs') result = Array(count).fill(0).map(randomParagraph).map(p=>`<p>${p}</p>`).join('');
+            else if (type==='sentences') result = Array(count).fill(0).map(randomSentence).join('');
+            else result = Array(count).fill(0).map(randomWord).join('、');
+            document.getElementById('output').innerHTML = result;
+        }
+        function copy() { navigator.clipboard.writeText(document.getElementById('output').innerText); }
+        generate();
+    </script>
+</body>
+</html>

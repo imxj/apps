@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线秒表 - 计时器与分段计时</title>
+    <meta name="description" content="免费在线秒表工具，支持分段计时功能。适用于运动、健身、学习计时。">
+    <meta name="keywords" content="秒表,在线秒表,计时器,分段计时,运动计时">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: #111; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .display { font-size: 6rem; font-weight: 200; font-family: monospace; margin-bottom: 40px; }
+        .ms { font-size: 3rem; color: #666; }
+        .controls { display: flex; gap: 20px; margin-bottom: 30px; }
+        button { width: 100px; height: 100px; border-radius: 50%; border: 3px solid; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .start { border-color: #00ff88; background: rgba(0,255,136,0.1); color: #00ff88; }
+        .stop { border-color: #ff4444; background: rgba(255,68,68,0.1); color: #ff4444; }
+        .lap { border-color: #666; background: rgba(102,102,102,0.1); color: #888; }
+        .reset { border-color: #666; background: rgba(102,102,102,0.1); color: #888; }
+        .laps { width: 100%; max-width: 400px; max-height: 300px; overflow-y: auto; }
+        .lap-item { display: flex; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #222; }
+        .lap-item:first-child { color: #00ff88; }
+        .lap-item:last-child { color: #ff4444; }
+    </style>
+</head>
+<body>
+    <div class="display" id="display">00:00<span class="ms">.00</span></div>
+    <div class="controls">
+        <button class="lap" onclick="lap()">分段</button>
+        <button class="start" id="startBtn" onclick="toggle()">开始</button>
+        <button class="reset" onclick="reset()">重置</button>
+    </div>
+    <div class="laps" id="laps"></div>
+    <script>
+        let startTime = 0, elapsed = 0, interval = null, running = false, laps = [], lastLap = 0;
+        function format(ms) { const m = Math.floor(ms/60000), s = Math.floor((ms%60000)/1000), c = Math.floor((ms%1000)/10); return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}<span class="ms">.${c.toString().padStart(2,'0')}</span>`; }
+        function update() { elapsed = Date.now() - startTime; document.getElementById('display').innerHTML = format(elapsed); }
+        function toggle() {
+            const btn = document.getElementById('startBtn');
+            if (running) { clearInterval(interval); btn.textContent = '继续'; btn.className = 'start'; }
+            else { startTime = Date.now() - elapsed; interval = setInterval(update, 10); btn.textContent = '停止'; btn.className = 'stop'; }
+            running = !running;
+        }
+        function lap() { if (!running) return; laps.unshift({num: laps.length+1, time: elapsed-lastLap, total: elapsed}); lastLap = elapsed; renderLaps(); }
+        function renderLaps() { document.getElementById('laps').innerHTML = laps.map(l => `<div class="lap-item"><span>第${l.num}段</span><span>+${formatSimple(l.time)}</span><span>${formatSimple(l.total)}</span></div>`).join(''); }
+        function formatSimple(ms) { const m = Math.floor(ms/60000), s = Math.floor((ms%60000)/1000), c = Math.floor((ms%1000)/10); return `${m}:${s.toString().padStart(2,'0')}.${c.toString().padStart(2,'0')}`; }
+        function reset() { clearInterval(interval); running = false; elapsed = 0; lastLap = 0; laps = []; document.getElementById('display').innerHTML = format(0); document.getElementById('startBtn').textContent = '开始'; document.getElementById('startBtn').className = 'start'; document.getElementById('laps').innerHTML = ''; }
+    </script>
+</body>
+</html>

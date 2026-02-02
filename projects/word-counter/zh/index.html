@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字数统计工具 - 在线字符计数器</title>
+    <meta name="description" content="免费在线字数统计工具，统计汉字、字符、句子、段落数量和阅读时间。支持中英文混合文本。">
+    <meta name="keywords" content="字数统计,字符统计,在线字数,字数计算器,文字统计">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: rgba(255,255,255,0.95); border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: #667eea; }
+        .stat-card .label { font-size: 0.85rem; color: #666; margin-top: 5px; }
+        textarea { width: 100%; height: 300px; padding: 20px; border: none; border-radius: 12px; font-size: 16px; line-height: 1.8; resize: vertical; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        textarea:focus { outline: 3px solid rgba(102,126,234,0.5); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 字数统计工具</h1>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="number" id="chars">0</div><div class="label">总字符</div></div>
+            <div class="stat-card"><div class="number" id="charsNoSpace">0</div><div class="label">不含空格</div></div>
+            <div class="stat-card"><div class="number" id="chinese">0</div><div class="label">汉字</div></div>
+            <div class="stat-card"><div class="number" id="words">0</div><div class="label">英文单词</div></div>
+            <div class="stat-card"><div class="number" id="sentences">0</div><div class="label">句子</div></div>
+            <div class="stat-card"><div class="number" id="readTime">0</div><div class="label">分钟阅读</div></div>
+        </div>
+        <textarea id="text" placeholder="在这里输入或粘贴文字..." oninput="analyze()"></textarea>
+    </div>
+    <script>
+        function analyze() {
+            const text = document.getElementById('text').value;
+            const chars = text.length;
+            const charsNoSpace = text.replace(/\s/g, '').length;
+            const chinese = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+            const words = (text.match(/[a-zA-Z]+/g) || []).length;
+            const sentences = text.split(/[.!?。！？]+/).filter(s => s.trim()).length;
+            const readTime = Math.ceil((chinese + words) / 300);
+            document.getElementById('chars').textContent = chars;
+            document.getElementById('charsNoSpace').textContent = charsNoSpace;
+            document.getElementById('chinese').textContent = chinese;
+            document.getElementById('words').textContent = words;
+            document.getElementById('sentences').textContent = sentences;
+            document.getElementById('readTime').textContent = readTime;
+        }
+    </script>
+</body>
+</html>

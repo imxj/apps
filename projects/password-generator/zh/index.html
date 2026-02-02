@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密码生成器 - 在线生成安全强密码</title>
+    <meta name="description" content="免费在线密码生成器，生成安全随机强密码。自定义长度、包含大小写字母、数字和特殊符号。">
+    <meta name="keywords" content="密码生成器,随机密码,强密码,安全密码,在线生成密码">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .container { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+        h1 { text-align: center; margin-bottom: 30px; color: #1a1a2e; }
+        .password-display { background: #f5f5f5; border-radius: 12px; padding: 20px; margin-bottom: 25px; position: relative; }
+        .password { font-family: monospace; font-size: 1.4rem; word-break: break-all; color: #1a1a2e; min-height: 50px; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .copy-btn:hover { background: #5a6fd6; }
+        .copy-btn.copied { background: #28a745; }
+        .strength { height: 6px; border-radius: 3px; margin-top: 15px; transition: all 0.3s; }
+        .strength.weak { background: #dc3545; width: 25%; }
+        .strength.fair { background: #ffc107; width: 50%; }
+        .strength.good { background: #28a745; width: 75%; }
+        .strength.strong { background: linear-gradient(90deg, #28a745, #20c997); width: 100%; }
+        .controls { margin-bottom: 25px; }
+        .control-group { margin-bottom: 20px; }
+        .control-group label { display: flex; justify-content: space-between; margin-bottom: 8px; color: #555; font-weight: 500; }
+        .control-group input[type="range"] { width: 100%; height: 8px; border-radius: 4px; -webkit-appearance: none; background: #e0e0e0; }
+        .control-group input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #667eea; cursor: pointer; }
+        .checkboxes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 12px; background: #f9f9f9; border-radius: 8px; cursor: pointer; }
+        .checkbox-item:hover { background: #f0f0f0; }
+        .checkbox-item input { width: 18px; height: 18px; accent-color: #667eea; }
+        .generate-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 密码生成器</h1>
+        <div class="password-display">
+            <div class="password" id="password">点击生成！</div>
+            <button class="copy-btn" id="copyBtn" onclick="copyPassword()">复制</button>
+            <div class="strength" id="strength"></div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label><span>密码长度</span><span id="lengthValue">16</span></label>
+                <input type="range" id="length" min="8" max="64" value="16" oninput="updateLength()">
+            </div>
+            <div class="checkboxes">
+                <label class="checkbox-item"><input type="checkbox" id="uppercase" checked onchange="generate()"><span>大写 ABC</span></label>
+                <label class="checkbox-item"><input type="checkbox" id="lowercase" checked onchange="generate()"><span>小写 abc</span></label>
+                <label class="checkbox-item"><input type="checkbox" id="numbers" checked onchange="generate()"><span>数字 123</span></label>
+                <label class="checkbox-item"><input type="checkbox" id="symbols" checked onchange="generate()"><span>符号 !@#</span></label>
+            </div>
+        </div>
+        <button class="generate-btn" onclick="generate()">生成密码</button>
+    </div>
+    <script>
+        const chars = { uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', lowercase: 'abcdefghijklmnopqrstuvwxyz', numbers: '0123456789', symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?' };
+        function generate() {
+            const length = parseInt(document.getElementById('length').value);
+            let charset = '';
+            if (document.getElementById('uppercase').checked) charset += chars.uppercase;
+            if (document.getElementById('lowercase').checked) charset += chars.lowercase;
+            if (document.getElementById('numbers').checked) charset += chars.numbers;
+            if (document.getElementById('symbols').checked) charset += chars.symbols;
+            if (!charset) { document.getElementById('password').textContent = '请至少选择一项！'; return; }
+            let password = ''; const array = new Uint32Array(length); crypto.getRandomValues(array);
+            for (let i = 0; i < length; i++) password += charset[array[i] % charset.length];
+            document.getElementById('password').textContent = password;
+            updateStrength(password, charset.length);
+        }
+        function updateStrength(pw, cs) {
+            const entropy = pw.length * Math.log2(cs), el = document.getElementById('strength');
+            el.className = 'strength ' + (entropy < 40 ? 'weak' : entropy < 60 ? 'fair' : entropy < 80 ? 'good' : 'strong');
+        }
+        function updateLength() { document.getElementById('lengthValue').textContent = document.getElementById('length').value; generate(); }
+        function copyPassword() {
+            const pw = document.getElementById('password').textContent;
+            if (pw && pw !== '点击生成！' && pw !== '请至少选择一项！') {
+                navigator.clipboard.writeText(pw);
+                const btn = document.getElementById('copyBtn'); btn.textContent = '已复制！'; btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+            }
+        }
+        generate();
+    </script>
+</body>
+</html>
