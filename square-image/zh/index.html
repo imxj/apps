@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正方形图片裁剪 - 在线1:1图片制作</title>
+    <meta name="description" content="免费在线正方形图片制作工具，快速将图片裁剪为1:1比例，适合社交媒体头像。">
+    <meta name="keywords" content="正方形图片,1:1裁剪,头像制作,图片裁剪">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; display: flex; align-items: center; justify-content: center; }
+        .container { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 100%; }
+        h1 { text-align: center; margin-bottom: 20px; color: #333; }
+        .upload-area { border: 3px dashed #ddd; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; margin-bottom: 20px; }
+        .preview { text-align: center; margin: 20px 0; }
+        .preview canvas { max-width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .options { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .option { padding: 10px 20px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; }
+        .option.active { background: #667eea; color: white; }
+        button { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⬛ 正方形图片</h1>
+        <div class="upload-area" onclick="document.getElementById('file').click()">
+            <p style="font-size:2rem;margin-bottom:10px">📷</p>
+            <p>点击上传图片</p>
+        </div>
+        <input type="file" id="file" accept="image/*" onchange="load(this)">
+        <div class="options">
+            <button class="option active" onclick="setMode('cover')">裁剪填充</button>
+            <button class="option" onclick="setMode('contain')">留白适应</button>
+        </div>
+        <div class="preview"><canvas id="canvas" width="400" height="400"></canvas></div>
+        <button onclick="download()">下载图片</button>
+    </div>
+    <script>
+        let img = null, mode = 'cover';
+        function load(input) { if(!input.files[0]) return; img = new Image(); img.onload = render; img.src = URL.createObjectURL(input.files[0]); }
+        function setMode(m) { mode = m; document.querySelectorAll('.option').forEach((o,i) => o.classList.toggle('active', i === (m==='cover'?0:1))); render(); }
+        function render() {
+            if (!img) return;
+            const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d'), size = 400;
+            ctx.fillStyle = '#fff'; ctx.fillRect(0,0,size,size);
+            if (mode === 'cover') {
+                const scale = Math.max(size/img.width, size/img.height);
+                const w = img.width*scale, h = img.height*scale;
+                ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+            } else {
+                const scale = Math.min(size/img.width, size/img.height);
+                const w = img.width*scale, h = img.height*scale;
+                ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+            }
+        }
+        function download() { const a = document.createElement('a'); a.href = document.getElementById('canvas').toDataURL('image/png'); a.download = 'square.png'; a.click(); }
+    </script>
+</body>
+</html>

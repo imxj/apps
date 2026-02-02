@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON格式化工具 - 在线JSON美化压缩</title>
+    <meta name="description" content="免费在线JSON格式化工具，美化、压缩、验证JSON数据。支持语法高亮显示。">
+    <meta name="keywords" content="JSON格式化,JSON美化,JSON压缩,JSON验证,在线JSON">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: #1e1e1e; color: #d4d4d4; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 20px; color: #569cd6; }
+        .editor-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: #252526; border-radius: 10px; padding: 15px; }
+        .panel h3 { margin-bottom: 10px; color: #9cdcfe; font-size: 0.9rem; }
+        textarea { width: 100%; height: 500px; background: #1e1e1e; border: 1px solid #3c3c3c; color: #d4d4d4; padding: 15px; font-family: 'Monaco', monospace; font-size: 14px; border-radius: 5px; resize: vertical; }
+        textarea:focus { outline: none; border-color: #569cd6; }
+        .buttons { text-align: center; margin: 20px 0; }
+        button { padding: 12px 25px; margin: 5px; background: #0e639c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; }
+        button:hover { background: #1177bb; }
+        .error { color: #f48771; font-size: 0.9rem; margin-top: 10px; }
+        .success { color: #89d185; font-size: 0.9rem; margin-top: 10px; }
+        @media (max-width: 768px) { .editor-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{ } JSON格式化工具</h1>
+        <div class="buttons">
+            <button onclick="format()">美化格式化</button>
+            <button onclick="minify()">压缩</button>
+            <button onclick="validate()">验证</button>
+            <button onclick="copyOutput()">复制结果</button>
+            <button onclick="clearAll()">清空</button>
+        </div>
+        <div class="editor-container">
+            <div class="panel">
+                <h3>输入 JSON</h3>
+                <textarea id="input" placeholder='粘贴JSON数据...\n例如: {"name": "张三", "age": 25}'></textarea>
+            </div>
+            <div class="panel">
+                <h3>输出结果</h3>
+                <textarea id="output" readonly placeholder="格式化结果将显示在这里..."></textarea>
+                <div id="message"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function format() {
+            try {
+                const input = document.getElementById('input').value;
+                const obj = JSON.parse(input);
+                document.getElementById('output').value = JSON.stringify(obj, null, 2);
+                showMessage('格式化成功！', 'success');
+            } catch (e) { showMessage('JSON格式错误: ' + e.message, 'error'); }
+        }
+        function minify() {
+            try {
+                const input = document.getElementById('input').value;
+                const obj = JSON.parse(input);
+                document.getElementById('output').value = JSON.stringify(obj);
+                showMessage('压缩成功！', 'success');
+            } catch (e) { showMessage('JSON格式错误: ' + e.message, 'error'); }
+        }
+        function validate() {
+            try {
+                JSON.parse(document.getElementById('input').value);
+                showMessage('✓ JSON格式正确！', 'success');
+            } catch (e) { showMessage('✗ JSON格式错误: ' + e.message, 'error'); }
+        }
+        function copyOutput() { navigator.clipboard.writeText(document.getElementById('output').value); showMessage('已复制！', 'success'); }
+        function clearAll() { document.getElementById('input').value = ''; document.getElementById('output').value = ''; document.getElementById('message').innerHTML = ''; }
+        function showMessage(msg, type) { document.getElementById('message').innerHTML = `<div class="${type}">${msg}</div>`; }
+    </script>
+</body>
+</html>

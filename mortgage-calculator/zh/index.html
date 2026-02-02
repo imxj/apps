@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房贷计算器 - 在线房贷月供计算</title>
+    <meta name="description" content="免费在线房贷计算器，计算等额本息和等额本金月供，查看还款明细。">
+    <meta name="keywords" content="房贷计算器,月供计算,等额本息,等额本金,贷款计算">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; }
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #666; }
+        .input-group input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; }
+        .input-group input:focus { outline: none; border-color: #667eea; }
+        .type-switch { display: flex; gap: 10px; margin-bottom: 20px; }
+        .type-btn { flex: 1; padding: 12px; background: #f0f0f0; border: none; border-radius: 10px; cursor: pointer; }
+        .type-btn.active { background: #667eea; color: white; }
+        .result { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; padding: 25px; color: white; text-align: center; margin-top: 20px; }
+        .result .monthly { font-size: 2.5rem; font-weight: 700; }
+        .result .label { opacity: 0.8; margin-bottom: 5px; }
+        .details { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .detail-item { text-align: center; }
+        .detail-item .value { font-size: 1.2rem; font-weight: 600; }
+        .detail-item .label { font-size: 0.85rem; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 房贷计算器</h1>
+        <div class="card">
+            <div class="input-group">
+                <label>贷款金额（万元）</label>
+                <input type="number" id="principal" value="100" oninput="calculate()">
+            </div>
+            <div class="input-group">
+                <label>年利率（%）</label>
+                <input type="number" id="rate" value="4.2" step="0.01" oninput="calculate()">
+            </div>
+            <div class="input-group">
+                <label>贷款年限</label>
+                <input type="number" id="years" value="30" oninput="calculate()">
+            </div>
+            <div class="type-switch">
+                <button class="type-btn active" onclick="setType('equal')" id="btn-equal">等额本息</button>
+                <button class="type-btn" onclick="setType('principal')" id="btn-principal">等额本金</button>
+            </div>
+            <div class="result">
+                <div class="label">月供</div>
+                <div class="monthly" id="monthly">¥0</div>
+                <div class="details">
+                    <div class="detail-item"><div class="value" id="totalPayment">¥0</div><div class="label">还款总额</div></div>
+                    <div class="detail-item"><div class="value" id="totalInterest">¥0</div><div class="label">利息总额</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let type = 'equal';
+        function setType(t) { type = t; document.getElementById('btn-equal').classList.toggle('active', t==='equal'); document.getElementById('btn-principal').classList.toggle('active', t==='principal'); calculate(); }
+        function calculate() {
+            const P = parseFloat(document.getElementById('principal').value) * 10000;
+            const r = parseFloat(document.getElementById('rate').value) / 100 / 12;
+            const n = parseInt(document.getElementById('years').value) * 12;
+            let monthly, total, interest;
+            if (type === 'equal') {
+                monthly = P * r * Math.pow(1+r, n) / (Math.pow(1+r, n) - 1);
+                total = monthly * n;
+            } else {
+                const firstMonth = P/n + P*r;
+                const lastMonth = P/n + (P/n)*r;
+                monthly = (firstMonth + lastMonth) / 2;
+                total = P + P*r*(n+1)/2;
+            }
+            interest = total - P;
+            document.getElementById('monthly').textContent = '¥' + monthly.toFixed(2);
+            document.getElementById('totalPayment').textContent = '¥' + (total/10000).toFixed(2) + '万';
+            document.getElementById('totalInterest').textContent = '¥' + (interest/10000).toFixed(2) + '万';
+        }
+        calculate();
+    </script>
+</body>
+</html>

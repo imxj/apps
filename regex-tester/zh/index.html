@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正则表达式测试器 - 在线Regex测试</title>
+    <meta name="description" content="免费在线正则表达式测试工具，实时匹配高亮显示，支持多种标志位。程序员必备。">
+    <meta name="keywords" content="正则表达式,Regex测试,正则测试器,在线正则">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #00d9ff; }
+        .regex-input { background: #16213e; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .regex-row { display: flex; align-items: center; gap: 10px; }
+        .regex-row span { color: #00d9ff; font-size: 1.5rem; }
+        .regex-row input { flex: 1; padding: 15px; background: #0f0f23; border: 2px solid #333; border-radius: 8px; color: #fff; font-family: monospace; font-size: 16px; }
+        .regex-row input:focus { outline: none; border-color: #00d9ff; }
+        .flags { margin-top: 15px; display: flex; gap: 20px; flex-wrap: wrap; }
+        .flags label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .flags input { width: 18px; height: 18px; }
+        textarea { width: 100%; height: 200px; padding: 15px; background: #16213e; border: 2px solid #333; border-radius: 10px; color: #eee; font-family: monospace; font-size: 14px; line-height: 1.6; resize: vertical; }
+        textarea:focus { outline: none; border-color: #00d9ff; }
+        .results { background: #16213e; border-radius: 10px; padding: 20px; margin-top: 20px; }
+        .results h3 { color: #00d9ff; margin-bottom: 15px; }
+        .match { background: rgba(0,217,255,0.3); padding: 2px 4px; border-radius: 3px; }
+        .match-list { font-family: monospace; line-height: 2; }
+        .match-item { background: #0f0f23; padding: 8px 12px; border-radius: 5px; margin: 5px 0; display: inline-block; margin-right: 10px; }
+        .error { color: #ff6b6b; }
+        .stats { color: #888; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 正则表达式测试器</h1>
+        <div class="regex-input">
+            <div class="regex-row">
+                <span>/</span>
+                <input type="text" id="regex" placeholder="输入正则表达式..." value="\b\w+@\w+\.\w+\b" oninput="test()">
+                <span>/</span>
+            </div>
+            <div class="flags">
+                <label><input type="checkbox" id="flag-g" checked onchange="test()"> g 全局</label>
+                <label><input type="checkbox" id="flag-i" onchange="test()"> i 忽略大小写</label>
+                <label><input type="checkbox" id="flag-m" onchange="test()"> m 多行</label>
+            </div>
+        </div>
+        <textarea id="text" placeholder="输入要测试的文本..." oninput="test()">联系我们：support@example.com 或 info@test.org
+电话：123-456-7890</textarea>
+        <div class="results">
+            <h3>匹配结果</h3>
+            <div id="highlighted"></div>
+            <div class="match-list" id="matches"></div>
+            <div class="stats" id="stats"></div>
+        </div>
+    </div>
+    <script>
+        function test() {
+            const pattern = document.getElementById('regex').value;
+            const text = document.getElementById('text').value;
+            let flags = '';
+            if (document.getElementById('flag-g').checked) flags += 'g';
+            if (document.getElementById('flag-i').checked) flags += 'i';
+            if (document.getElementById('flag-m').checked) flags += 'm';
+            
+            try {
+                const regex = new RegExp(pattern, flags);
+                const matches = text.match(regex) || [];
+                
+                // Highlight
+                let highlighted = text.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+                if (pattern && matches.length) {
+                    highlighted = highlighted.replace(new RegExp(pattern, flags), m => `<span class="match">${m}</span>`);
+                }
+                document.getElementById('highlighted').innerHTML = `<pre style="white-space:pre-wrap;margin:0">${highlighted}</pre>`;
+                
+                // Match list
+                document.getElementById('matches').innerHTML = matches.length 
+                    ? matches.map(m => `<span class="match-item">${m}</span>`).join('') 
+                    : '<span style="color:#888">无匹配</span>';
+                
+                document.getElementById('stats').textContent = `共 ${matches.length} 个匹配`;
+            } catch (e) {
+                document.getElementById('highlighted').innerHTML = `<span class="error">正则表达式错误: ${e.message}</span>`;
+                document.getElementById('matches').innerHTML = '';
+                document.getElementById('stats').textContent = '';
+            }
+        }
+        test();
+    </script>
+</body>
+</html>

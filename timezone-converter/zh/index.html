@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时区转换器 - 在线世界时间转换</title>
+    <meta name="description" content="免费在线时区转换工具，快速转换全球各地时间。支持主要城市时区。">
+    <meta name="keywords" content="时区转换,时间转换,世界时间,时区计算,北京时间">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); min-height: 100vh; padding: 20px; color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .converter { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); }
+        .time-group { margin-bottom: 25px; }
+        .time-group label { display: block; margin-bottom: 10px; opacity: 0.8; }
+        select, input { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 16px; background: rgba(255,255,255,0.9); color: #333; }
+        .current-time { text-align: center; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 15px; margin-top: 20px; }
+        .current-time .time { font-size: 3rem; font-weight: 300; }
+        .current-time .date { opacity: 0.7; margin-top: 10px; }
+        .quick-zones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .quick-zone { padding: 10px 15px; background: rgba(255,255,255,0.1); border: none; border-radius: 20px; color: white; cursor: pointer; font-size: 0.9rem; }
+        .quick-zone:hover { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 时区转换器</h1>
+        <div class="converter">
+            <div class="time-group">
+                <label>从时区</label>
+                <select id="fromZone" onchange="convert()">
+                    <option value="Asia/Shanghai">北京时间 (UTC+8)</option>
+                    <option value="America/New_York">纽约 (UTC-5/-4)</option>
+                    <option value="America/Los_Angeles">洛杉矶 (UTC-8/-7)</option>
+                    <option value="Europe/London">伦敦 (UTC+0/+1)</option>
+                    <option value="Europe/Paris">巴黎 (UTC+1/+2)</option>
+                    <option value="Asia/Tokyo">东京 (UTC+9)</option>
+                    <option value="Australia/Sydney">悉尼 (UTC+10/+11)</option>
+                    <option value="UTC">UTC</option>
+                </select>
+            </div>
+            <div class="time-group">
+                <label>时间</label>
+                <input type="datetime-local" id="inputTime" onchange="convert()">
+            </div>
+            <div class="time-group">
+                <label>到时区</label>
+                <select id="toZone" onchange="convert()">
+                    <option value="America/New_York">纽约 (UTC-5/-4)</option>
+                    <option value="Asia/Shanghai">北京时间 (UTC+8)</option>
+                    <option value="America/Los_Angeles">洛杉矶 (UTC-8/-7)</option>
+                    <option value="Europe/London">伦敦 (UTC+0/+1)</option>
+                    <option value="Europe/Paris">巴黎 (UTC+1/+2)</option>
+                    <option value="Asia/Tokyo">东京 (UTC+9)</option>
+                    <option value="Australia/Sydney">悉尼 (UTC+10/+11)</option>
+                    <option value="UTC">UTC</option>
+                </select>
+            </div>
+            <div class="current-time">
+                <div class="time" id="result">--:--</div>
+                <div class="date" id="resultDate">选择时间进行转换</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function init() {
+            const now = new Date();
+            document.getElementById('inputTime').value = now.toISOString().slice(0, 16);
+            convert();
+        }
+        function convert() {
+            const fromZone = document.getElementById('fromZone').value;
+            const toZone = document.getElementById('toZone').value;
+            const inputTime = document.getElementById('inputTime').value;
+            if (!inputTime) return;
+            
+            const date = new Date(inputTime);
+            const options = { timeZone: toZone, hour: '2-digit', minute: '2-digit', hour12: false };
+            const dateOptions = { timeZone: toZone, year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            
+            document.getElementById('result').textContent = date.toLocaleTimeString('zh-CN', options);
+            document.getElementById('resultDate').textContent = date.toLocaleDateString('zh-CN', dateOptions);
+        }
+        init();
+    </script>
+</body>
+</html>

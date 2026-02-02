@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单位换算器 - 在线单位转换工具</title>
+    <meta name="description" content="免费在线单位换算工具，支持长度、重量、温度、面积、体积等多种单位转换。">
+    <meta name="keywords" content="单位换算,单位转换,长度换算,重量换算,温度换算">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #11998e, #38ef7d); min-height: 100vh; padding: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; text-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+        .converter { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .category-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; }
+        .tab { padding: 10px 15px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
+        .tab.active { background: #11998e; color: white; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #666; font-size: 0.9rem; }
+        .input-row { display: flex; gap: 10px; }
+        .input-row input { flex: 2; padding: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 18px; }
+        .input-row select { flex: 1; padding: 15px; border: 2px solid #eee; border-radius: 10px; font-size: 14px; }
+        .input-row input:focus, .input-row select:focus { outline: none; border-color: #11998e; }
+        .swap-btn { display: block; margin: 15px auto; padding: 10px 20px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; }
+        .result { text-align: center; padding: 20px; background: linear-gradient(135deg, #11998e, #38ef7d); border-radius: 15px; color: white; font-size: 1.5rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📏 单位换算器</h1>
+        <div class="converter">
+            <div class="category-tabs">
+                <button class="tab active" onclick="setCategory('length')">长度</button>
+                <button class="tab" onclick="setCategory('weight')">重量</button>
+                <button class="tab" onclick="setCategory('temperature')">温度</button>
+                <button class="tab" onclick="setCategory('area')">面积</button>
+                <button class="tab" onclick="setCategory('volume')">体积</button>
+                <button class="tab" onclick="setCategory('data')">数据</button>
+            </div>
+            <div class="input-group">
+                <label>从</label>
+                <div class="input-row">
+                    <input type="number" id="fromValue" value="1" oninput="convert()">
+                    <select id="fromUnit" onchange="convert()"></select>
+                </div>
+            </div>
+            <button class="swap-btn" onclick="swap()">⇅ 交换</button>
+            <div class="input-group">
+                <label>到</label>
+                <div class="input-row">
+                    <input type="number" id="toValue" readonly>
+                    <select id="toUnit" onchange="convert()"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const units = {
+            length: { '米': 1, '千米': 1000, '厘米': 0.01, '毫米': 0.001, '英寸': 0.0254, '英尺': 0.3048, '码': 0.9144, '英里': 1609.34 },
+            weight: { '千克': 1, '克': 0.001, '毫克': 0.000001, '吨': 1000, '磅': 0.453592, '盎司': 0.0283495 },
+            temperature: { '摄氏度': 'c', '华氏度': 'f', '开尔文': 'k' },
+            area: { '平方米': 1, '平方千米': 1000000, '公顷': 10000, '平方厘米': 0.0001, '平方英尺': 0.092903, '英亩': 4046.86 },
+            volume: { '升': 1, '毫升': 0.001, '立方米': 1000, '加仑': 3.78541, '品脱': 0.473176, '杯': 0.236588 },
+            data: { '字节': 1, 'KB': 1024, 'MB': 1048576, 'GB': 1073741824, 'TB': 1099511627776 }
+        };
+        let currentCategory = 'length';
+        
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            const opts = Object.keys(units[cat]).map(u => `<option value="${u}">${u}</option>`).join('');
+            document.getElementById('fromUnit').innerHTML = opts;
+            document.getElementById('toUnit').innerHTML = opts;
+            document.getElementById('toUnit').selectedIndex = 1;
+            convert();
+        }
+        
+        function convert() {
+            const from = document.getElementById('fromUnit').value;
+            const to = document.getElementById('toUnit').value;
+            const value = parseFloat(document.getElementById('fromValue').value) || 0;
+            
+            if (currentCategory === 'temperature') {
+                let celsius;
+                if (from === '摄氏度') celsius = value;
+                else if (from === '华氏度') celsius = (value - 32) * 5/9;
+                else celsius = value - 273.15;
+                
+                let result;
+                if (to === '摄氏度') result = celsius;
+                else if (to === '华氏度') result = celsius * 9/5 + 32;
+                else result = celsius + 273.15;
+                
+                document.getElementById('toValue').value = result.toFixed(2);
+            } else {
+                const base = value * units[currentCategory][from];
+                const result = base / units[currentCategory][to];
+                document.getElementById('toValue').value = result.toPrecision(6);
+            }
+        }
+        
+        function swap() {
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            [fromUnit.value, toUnit.value] = [toUnit.value, fromUnit.value];
+            convert();
+        }
+        
+        setCategory('length');
+    </script>
+</body>
+</html>

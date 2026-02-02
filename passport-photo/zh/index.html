@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>证件照制作 - 在线免费制作证件照</title>
+    <meta name="description" content="免费在线证件照制作工具，支持一寸、二寸、护照照片等多种规格，可更换背景颜色。">
+    <meta name="keywords" content="证件照,护照照片,一寸照片,二寸照片,证件照制作">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: white; margin-bottom: 30px; }
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .upload-area { border: 3px dashed #ddd; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; margin-bottom: 25px; }
+        .upload-area:hover { border-color: #667eea; background: #f8f9ff; }
+        .upload-icon { font-size: 3rem; margin-bottom: 15px; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .control-group label { display: block; font-size: 0.9rem; color: #666; margin-bottom: 8px; }
+        .control-group select, .control-group input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; }
+        .preview-area { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .preview-box { text-align: center; }
+        .preview-box canvas { border: 1px solid #ddd; border-radius: 5px; }
+        .preview-box p { font-size: 0.8rem; color: #888; margin-top: 5px; }
+        .download-btn { display: block; width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
+        input[type="file"] { display: none; }
+        .bg-colors { display: flex; gap: 10px; flex-wrap: wrap; }
+        .bg-color { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; }
+        .bg-color.active { border-color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📷 证件照制作</h1>
+        <div class="card">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <p>点击上传照片</p>
+                <p style="color:#888;font-size:0.9rem;margin-top:10px">建议使用正面免冠照片</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" onchange="loadImage(this)">
+            <div class="controls">
+                <div class="control-group">
+                    <label>照片规格</label>
+                    <select id="size" onchange="updatePreview()">
+                        <option value="295,413">一寸 (25×35mm)</option>
+                        <option value="413,579">二寸 (35×49mm)</option>
+                        <option value="390,567">小二寸 (33×48mm)</option>
+                        <option value="600,600">护照 (51×51mm)</option>
+                        <option value="472,649">签证 (40×55mm)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>背景颜色</label>
+                    <div class="bg-colors">
+                        <div class="bg-color active" style="background:#fff" onclick="setBg('#fff')"></div>
+                        <div class="bg-color" style="background:#438edb" onclick="setBg('#438edb')"></div>
+                        <div class="bg-color" style="background:#ff0000" onclick="setBg('#ff0000')"></div>
+                        <div class="bg-color" style="background:#f5f5f5" onclick="setBg('#f5f5f5')"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-area" id="preview"></div>
+            <button class="download-btn" onclick="download()">下载证件照</button>
+        </div>
+    </div>
+    <script>
+        let img = null, bgColor = '#fff';
+        function loadImage(input) {
+            if (!input.files[0]) return;
+            img = new Image();
+            img.onload = updatePreview;
+            img.src = URL.createObjectURL(input.files[0]);
+        }
+        function setBg(color) {
+            bgColor = color;
+            document.querySelectorAll('.bg-color').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            updatePreview();
+        }
+        function updatePreview() {
+            if (!img) return;
+            const [w, h] = document.getElementById('size').value.split(',').map(Number);
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+            
+            // Create canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Draw image centered/cover
+            const scale = Math.max(w / img.width, h / img.height);
+            const nw = img.width * scale, nh = img.height * scale;
+            ctx.drawImage(img, (w - nw) / 2, (h - nh) / 2, nw, nh);
+            
+            const box = document.createElement('div');
+            box.className = 'preview-box';
+            box.appendChild(canvas);
+            box.innerHTML += `<p>${w}×${h}px</p>`;
+            preview.appendChild(box);
+        }
+        function download() {
+            const canvas = document.querySelector('#preview canvas');
+            if (!canvas) return alert('请先上传照片');
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/jpeg', 0.95);
+            a.download = '证件照.jpg';
+            a.click();
+        }
+    </script>
+</body>
+</html>

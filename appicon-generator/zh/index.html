@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应用图标生成器 - iOS/Android图标制作</title>
+    <meta name="description" content="免费在线应用图标生成器，一键生成iOS和Android所需的各种尺寸图标。">
+    <meta name="keywords" content="应用图标,App图标,iOS图标,Android图标,图标生成">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, 'PingFang SC', sans-serif; background: #1a1a2e; color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .upload-area { background: #16213e; border: 3px dashed #333; border-radius: 15px; padding: 40px; text-align: center; cursor: pointer; margin-bottom: 30px; }
+        .upload-area:hover { border-color: #667eea; }
+        .icons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; }
+        .icon-item { background: #16213e; border-radius: 10px; padding: 15px; text-align: center; }
+        .icon-item canvas { border-radius: 15%; margin-bottom: 10px; }
+        .icon-item p { font-size: 0.8rem; color: #888; }
+        .download-all { display: block; width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; margin-top: 30px; }
+        input[type="file"] { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 应用图标生成器</h1>
+        <div class="upload-area" onclick="document.getElementById('file').click()">
+            <p style="font-size:2rem;margin-bottom:10px">📁</p>
+            <p>上传1024×1024的PNG图标</p>
+        </div>
+        <input type="file" id="file" accept="image/png" onchange="generate(this)">
+        <div class="icons-grid" id="icons"></div>
+        <button class="download-all" onclick="downloadAll()">下载所有图标 (ZIP)</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script>
+        const sizes = [20, 29, 40, 58, 60, 76, 80, 87, 120, 152, 167, 180, 1024];
+        let canvases = [];
+        function generate(input) {
+            if (!input.files[0]) return;
+            const img = new Image();
+            img.onload = () => {
+                const grid = document.getElementById('icons');
+                grid.innerHTML = '';
+                canvases = [];
+                sizes.forEach(size => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'icon-item';
+                    
+                    const preview = document.createElement('canvas');
+                    preview.width = preview.height = 60;
+                    preview.getContext('2d').drawImage(canvas, 0, 0, 60, 60);
+                    preview.style.width = '60px';
+                    
+                    item.appendChild(preview);
+                    item.innerHTML += `<p>${size}×${size}</p>`;
+                    grid.appendChild(item);
+                    canvases.push({ canvas, size });
+                });
+            };
+            img.src = URL.createObjectURL(input.files[0]);
+        }
+        async function downloadAll() {
+            if (!canvases.length) return alert('请先上传图标');
+            const zip = new JSZip();
+            for (const { canvas, size } of canvases) {
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                zip.file(`icon-${size}x${size}.png`, blob);
+            }
+            const content = await zip.generateAsync({ type: 'blob' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(content);
+            a.download = 'app-icons.zip';
+            a.click();
+        }
+    </script>
+</body>
+</html>
