@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeLog Pro — Smart Trading Journal for Options & Stock Traders</title>
+    <meta name="description" content="Free trading journal with P&L tracking, options profit calculator, and analytics. Track your trades, find your edge.">
+    <meta name="keywords" content="trading journal, options calculator, P&L tracker, stock trading, options profit calculator">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span class="logo-icon">📊</span>
+                <span class="logo-text">TradeLog<span class="logo-accent">Pro</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#calculator">Calculator</a>
+                <a href="#pricing">Pricing</a>
+                <a href="pages/app.html" class="nav-cta">Open App →</a>
+            </div>
+            <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="hero-grid"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">🔥 Free forever for basic use</div>
+                <h1 class="hero-title">
+                    Track Your Trades.<br>
+                    <span class="gradient-text">Find Your Edge.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    The trading journal that actually helps you make money. Log trades in seconds, 
+                    visualize your P&L, and discover patterns in your trading — all in your browser, 
+                    no sign-up required.
+                </p>
+                <div class="hero-actions">
+                    <a href="pages/app.html" class="btn btn-primary btn-lg">
+                        Start Journaling Free →
+                    </a>
+                    <a href="#calculator" class="btn btn-outline btn-lg">
+                        Try Options Calculator
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">100%</span>
+                        <span class="hero-stat-label">Client-Side</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">$0</span>
+                        <span class="hero-stat-label">To Start</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value">∞</span>
+                        <span class="hero-stat-label">Your Data, Your Device</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="mock-dashboard">
+                    <div class="mock-header">
+                        <div class="mock-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="mock-title">Dashboard — January 2026</span>
+                    </div>
+                    <div class="mock-body">
+                        <div class="mock-stat-row">
+                            <div class="mock-stat green">
+                                <div class="mock-stat-label">Total P&L</div>
+                                <div class="mock-stat-value">+$4,280</div>
+                            </div>
+                            <div class="mock-stat blue">
+                                <div class="mock-stat-label">Win Rate</div>
+                                <div class="mock-stat-value">68%</div>
+                            </div>
+                            <div class="mock-stat purple">
+                                <div class="mock-stat-label">Avg Winner</div>
+                                <div class="mock-stat-value">+$312</div>
+                            </div>
+                        </div>
+                        <div class="mock-chart">
+                            <svg viewBox="0 0 400 120" class="equity-curve">
+                                <defs>
+                                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+                                        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0,100 L20,95 L40,85 L60,90 L80,70 L100,75 L120,60 L140,55 L160,65 L180,45 L200,50 L220,35 L240,40 L260,30 L280,25 L300,35 L320,20 L340,15 L360,25 L380,10 L400,5" 
+                                      fill="none" stroke="#10b981" stroke-width="2.5"/>
+                                <path d="M0,100 L20,95 L40,85 L60,90 L80,70 L100,75 L120,60 L140,55 L160,65 L180,45 L200,50 L220,35 L240,40 L260,30 L280,25 L300,35 L320,20 L340,15 L360,25 L380,10 L400,5 L400,120 L0,120 Z" 
+                                      fill="url(#chartGrad)"/>
+                            </svg>
+                            <div class="mock-chart-label">Equity Curve</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything You Need to <span class="gradient-text">Trade Better</span></h2>
+                <p>Built by traders, for traders. No fluff, just the tools that matter.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Quick Trade Logging</h3>
+                    <p>Log any trade in under 10 seconds. Stocks, options, futures — all supported. Tag strategies, add notes, track emotions.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Real-Time P&L Tracking</h3>
+                    <p>See your running P&L, equity curve, and daily/weekly/monthly breakdowns. Know exactly where you stand.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧮</div>
+                    <h3>Options Profit Calculator</h3>
+                    <p>Model any options strategy before you trade. See max profit, max loss, and breakeven at every price point.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Pattern Discovery</h3>
+                    <p>Find which setups, times, and tickers are making (or losing) you money. Data-driven edge identification.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>100% Private</h3>
+                    <p>All data stays in your browser. We never see your trades, your P&L, or your strategies. Zero servers, zero risk.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📤</div>
+                    <h3>Export Everything</h3>
+                    <p>Export to CSV, JSON, or PDF anytime. Your data is always yours. Import from other journals too.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Options Calculator Section -->
+    <section class="calculator-section" id="calculator">
+        <div class="container">
+            <div class="section-header">
+                <h2>Options Profit <span class="gradient-text">Calculator</span></h2>
+                <p>Model your options trades before risking real money. Free, instant, no sign-up.</p>
+            </div>
+            <div class="calc-wrapper">
+                <div class="calc-inputs">
+                    <h3>📐 Strategy Builder</h3>
+                    <div class="calc-form">
+                        <div class="form-group">
+                            <label>Strategy</label>
+                            <select id="calcStrategy">
+                                <option value="long_call">Long Call</option>
+                                <option value="long_put">Long Put</option>
+                                <option value="covered_call">Covered Call</option>
+                                <option value="bull_call_spread">Bull Call Spread</option>
+                                <option value="bear_put_spread">Bear Put Spread</option>
+                                <option value="iron_condor">Iron Condor</option>
+                                <option value="straddle">Long Straddle</option>
+                                <option value="strangle">Long Strangle</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Stock Price</label>
+                            <input type="number" id="calcStockPrice" value="150" step="0.01" min="0">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Strike Price</label>
+                                <input type="number" id="calcStrike" value="155" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Premium Paid</label>
+                                <input type="number" id="calcPremium" value="3.50" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <!-- Additional inputs for spreads -->
+                        <div class="form-row spread-inputs" id="spreadInputs" style="display:none;">
+                            <div class="form-group">
+                                <label>Strike 2</label>
+                                <input type="number" id="calcStrike2" value="160" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Premium 2</label>
+                                <input type="number" id="calcPremium2" value="1.50" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <!-- Iron condor extra inputs -->
+                        <div class="form-row condor-inputs" id="condorInputs" style="display:none;">
+                            <div class="form-group">
+                                <label>Put Strike (Lower)</label>
+                                <input type="number" id="calcPutStrike" value="140" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Put Strike 2 (Lowest)</label>
+                                <input type="number" id="calcPutStrike2" value="135" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Contracts</label>
+                                <input type="number" id="calcContracts" value="1" step="1" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Days to Expiry</label>
+                                <input type="number" id="calcDTE" value="30" step="1" min="1">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-block" id="calcBtn">Calculate Profit/Loss →</button>
+                    </div>
+                </div>
+                <div class="calc-results">
+                    <h3>📊 Profit & Loss Analysis</h3>
+                    <div class="calc-stats" id="calcStats">
+                        <div class="calc-stat">
+                            <span class="calc-stat-label">Max Profit</span>
+                            <span class="calc-stat-value green" id="maxProfit">—</span>
+                        </div>
+                        <div class="calc-stat">
+                            <span class="calc-stat-label">Max Loss</span>
+                            <span class="calc-stat-value red" id="maxLoss">—</span>
+                        </div>
+                        <div class="calc-stat">
+                            <span class="calc-stat-label">Breakeven</span>
+                            <span class="calc-stat-value" id="breakeven">—</span>
+                        </div>
+                        <div class="calc-stat">
+                            <span class="calc-stat-label">Risk/Reward</span>
+                            <span class="calc-stat-value" id="riskReward">—</span>
+                        </div>
+                    </div>
+                    <div class="calc-chart-container">
+                        <canvas id="plChart" width="500" height="280"></canvas>
+                    </div>
+                    <p class="calc-disclaimer">* Simplified model. Does not account for IV changes, dividends, or early assignment.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header">
+                <h2>Simple, Honest <span class="gradient-text">Pricing</span></h2>
+                <p>Start free. Upgrade when you're ready for more.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="pricing-price">$0<span>/forever</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="included">✓ Up to 50 trades/month</li>
+                        <li class="included">✓ Basic P&L tracking</li>
+                        <li class="included">✓ Options calculator (all strategies)</li>
+                        <li class="included">✓ CSV export</li>
+                        <li class="included">✓ 30-day data retention</li>
+                        <li class="excluded">✗ Advanced analytics</li>
+                        <li class="excluded">✗ Unlimited trades</li>
+                        <li class="excluded">✗ PDF reports</li>
+                        <li class="excluded">✗ Multi-account</li>
+                    </ul>
+                    <a href="pages/app.html" class="btn btn-outline btn-block">Get Started Free</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <div class="pricing-price">$9.99<span>/month</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="included">✓ <strong>Unlimited</strong> trades</li>
+                        <li class="included">✓ Advanced analytics & charts</li>
+                        <li class="included">✓ Options calculator (all strategies)</li>
+                        <li class="included">✓ CSV, JSON & PDF export</li>
+                        <li class="included">✓ <strong>Unlimited</strong> data retention</li>
+                        <li class="included">✓ Win rate by strategy/ticker</li>
+                        <li class="included">✓ Calendar heatmap</li>
+                        <li class="included">✓ Multi-account support</li>
+                        <li class="included">✓ Priority support</li>
+                    </ul>
+                    <a href="pages/app.html?plan=pro" class="btn btn-primary btn-block">Start 7-Day Free Trial</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Lifetime</h3>
+                        <div class="pricing-price">$149<span>/once</span></div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li class="included">✓ Everything in Pro</li>
+                        <li class="included">✓ <strong>Pay once, own forever</strong></li>
+                        <li class="included">✓ All future updates</li>
+                        <li class="included">✓ Beta access to new features</li>
+                        <li class="included">✓ Direct founder access</li>
+                        <li class="included">✓ Custom strategy templates</li>
+                        <li class="included">✓ Multi-device sync (coming)</li>
+                        <li class="included">✓ API access (coming)</li>
+                        <li class="included">✓ Community Discord</li>
+                    </ul>
+                    <a href="pages/app.html?plan=lifetime" class="btn btn-outline btn-block">Get Lifetime Access</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials / Social Proof -->
+    <section class="social-proof">
+        <div class="container">
+            <div class="section-header">
+                <h2>Trusted by <span class="gradient-text">Active Traders</span></h2>
+            </div>
+            <div class="proof-grid">
+                <div class="proof-card">
+                    <div class="proof-stars">★★★★★</div>
+                    <p>"Finally a trading journal that doesn't need my brokerage login. Fast, private, and the options calculator alone is worth it."</p>
+                    <div class="proof-author">— Options trader, Reddit r/thetagang</div>
+                </div>
+                <div class="proof-card">
+                    <div class="proof-stars">★★★★★</div>
+                    <p>"I switched from Tradervue after they raised prices. TradeLog Pro does 90% of what I need for free. The analytics helped me spot that my Monday trades were killing my P&L."</p>
+                    <div class="proof-author">— Day trader, 3 years experience</div>
+                </div>
+                <div class="proof-card">
+                    <div class="proof-stars">★★★★★</div>
+                    <p>"The fact that everything runs in my browser and my data never leaves my machine is huge. I was nervous about cloud journals seeing my positions."</p>
+                    <div class="proof-author">— Swing trader, privacy-focused</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Start Tracking Your Trades <span class="gradient-text">Tonight</span></h2>
+                <p>No sign-up. No credit card. Just open the app and start logging. Your future self will thank you.</p>
+                <a href="pages/app.html" class="btn btn-primary btn-lg">Open TradeLog Pro Free →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <span class="logo-icon">📊</span>
+                    <span class="logo-text">TradeLog<span class="logo-accent">Pro</span></span>
+                    <p>The privacy-first trading journal for serious traders.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <a href="pages/app.html">Trading Journal</a>
+                    <a href="#calculator">Options Calculator</a>
+                    <a href="#pricing">Pricing</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="#">Blog (Coming Soon)</a>
+                    <a href="#">API Docs (Coming Soon)</a>
+                    <a href="#">Changelog</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Disclaimer</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 TradeLog Pro. All rights reserved. Not financial advice.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/calculator.js"></script>
+    <script src="js/landing.js"></script>
+</body>
+</html>
