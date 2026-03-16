@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Options Analysis | GOOG · NVDA · TSLA</title>
+    <meta name="description" content="Daily options trading analysis for GOOG, NVDA, TSLA — strategy selector, CSP, covered calls, LEAPs. Updated every trading day.">
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1c2333;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --red: #f85149;
+            --yellow: #d29922;
+            --purple: #bc8cff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1f35 0%, #0d1117 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+        .header .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .header .tickers {
+            margin-top: 0.8rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .ticker-badge {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .entry {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .entry:hover { border-color: var(--accent); }
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+        .entry-header:hover { background: var(--surface2); }
+        .entry-date {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .entry-date .weekday { color: var(--text-muted); font-weight: 400; }
+        .entry-prices {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+        .entry-prices .price-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .entry-prices .sym { color: var(--text-muted); }
+        .entry-summary {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+        }
+        .summary-bullets {
+            list-style: none;
+            padding: 0;
+        }
+        .summary-bullets li {
+            padding: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        .summary-bullets li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+        .entry-body {
+            padding: 1.25rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+        .entry.open .entry-body { display: block; }
+        .entry-body pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            color: var(--text);
+        }
+        .chevron {
+            transition: transform 0.2s;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+        .entry.open .chevron { transform: rotate(90deg); }
+        .three-red { color: var(--red); font-weight: 600; }
+        .no-red { color: var(--green); }
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        .disclaimer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        .toggle-arrow { font-size: 0.7rem; margin-left: 0.3rem; }
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.4rem; }
+            .entry-prices { display: none; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Daily Options Analysis</h1>
+        <p class="subtitle">Strategy Selector · CSP · Covered Call · LEAP Checklist</p>
+        <div class="tickers">
+            <span class="ticker-badge">GOOG</span>
+            <span class="ticker-badge">NVDA</span>
+            <span class="ticker-badge">TSLA</span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="7">Last 7 Days</button>
+            <button class="filter-btn" data-filter="30">Last 30 Days</button>
+        </div>
+        <div id="entries" class="loading">Loading analyses...</div>
+    </div>
+    <div class="disclaimer">
+        ⚠️ Not financial advice. For educational and informational purposes only.<br>
+        Data sourced from Yahoo Finance. Updated every trading day at 9:30 AM PT.
+    </div>
+
+    <script>
+    (async function() {
+        const container = document.getElementById('entries');
+        let allData = [];
+
+        try {
+            const resp = await fetch('data.json?t=' + Date.now());
+            allData = await resp.json();
+        } catch(e) {
+            container.innerHTML = '<p style="text-align:center;color:var(--text-muted)">No data yet. Check back after market open.</p>';
+            return;
+        }
+
+        // Sort newest first
+        allData.sort((a, b) => b.date.localeCompare(a.date));
+
+        function render(filter) {
+            let data = allData;
+            if (filter !== 'all') {
+                const days = parseInt(filter);
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - days);
+                const cutStr = cutoff.toISOString().slice(0, 10);
+                data = allData.filter(d => d.date >= cutStr);
+            }
+
+            if (data.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:var(--text-muted)">No analyses in this range.</p>';
+                return;
+            }
+
+            container.innerHTML = data.map((entry, i) => {
+                const d = new Date(entry.date + 'T12:00:00');
+                const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
+                const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                const prices = (entry.prices || []).map(p =>
+                    `<span class="price-item"><span class="sym">${p.ticker}</span> $${p.price}</span>`
+                ).join('');
+
+                const summary = (entry.summary || []).map(s =>
+                    `<li>${s}</li>`
+                ).join('');
+
+                return `
+                <div class="entry ${i === 0 ? 'open' : ''}" data-date="${entry.date}">
+                    <div class="entry-header" onclick="this.parentElement.classList.toggle('open')">
+                        <span class="entry-date">${dateStr} <span class="weekday">${weekday}</span></span>
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <div class="entry-prices">${prices}</div>
+                            <span class="chevron">›</span>
+                        </div>
+                    </div>
+                    ${summary ? `<div class="entry-summary"><ul class="summary-bullets">${summary}</ul></div>` : ''}
+                    <div class="entry-body"><pre>${escapeHtml(entry.body || '')}</pre></div>
+                </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        render('all');
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                render(btn.dataset.filter);
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
