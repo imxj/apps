@@ -52,12 +52,14 @@
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             position: relative;
+            min-height: 200px;
         }
         .output-text {
             line-height: 1.8;
             color: #333;
             max-height: 500px;
             overflow-y: auto;
+            padding-top: 10px;
         }
         .copy-btn {
             position: absolute;
@@ -69,6 +71,7 @@
             border: none;
             border-radius: 20px;
             cursor: pointer;
+            z-index: 1;
         }
         .copy-btn:hover { background: #555; }
         p { margin-bottom: 1em; }
