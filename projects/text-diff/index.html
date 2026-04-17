@@ -90,6 +90,11 @@
         .added { background: rgba(0, 255, 0, 0.2); color: #4ade80; }
         .removed { background: rgba(255, 0, 0, 0.2); color: #f87171; text-decoration: line-through; }
         .unchanged { color: #888; }
+        .diff-line { min-height: 1.6em; line-height: 1.6; padding: 1px 4px; }
+        .diff-line.pad { background: rgba(128,128,128,0.1); }
+        .diff-line.removed-line { background: rgba(255, 0, 0, 0.1); }
+        .diff-line.added-line { background: rgba(0, 255, 0, 0.1); }
+        .diff-line.modified-line { background: rgba(255, 165, 0, 0.08); }
         .stats {
             text-align: center;
             margin: 20px 0;
@@ -139,43 +144,123 @@
             const text1 = document.getElementById('text1').value;
             const text2 = document.getElementById('text2').value;
             
-            const words1 = text1.split(/(\s+)/);
-            const words2 = text2.split(/(\s+)/);
+            const lines1 = text1.split('\n');
+            const lines2 = text2.split('\n');
             
+            // Line-level LCS for alignment
+            const lineLcs = longestCommonSubsequence(lines1, lines2);
+            
+            let rows1 = [];
+            let rows2 = [];
+            let i = 0, j = 0, k = 0;
+            let added = 0, removed = 0;
+            
+            while (i < lines1.length || j < lines2.length) {
+                if (k < lineLcs.length && i < lines1.length && lines1[i] === lineLcs[k]) {
+                    if (j < lines2.length && lines2[j] === lineLcs[k]) {
+                        // Matching line
+                        rows1.push({ type: 'unchanged', text: lines1[i] });
+                        rows2.push({ type: 'unchanged', text: lines2[j] });
+                        i++; j++; k++;
+                    } else {
+                        // Added line on right
+                        rows1.push({ type: 'pad', text: '' });
+                        rows2.push({ type: 'added', text: lines2[j] });
+                        added++;
+                        j++;
+                    }
+                } else if (k < lineLcs.length && j < lines2.length && lines2[j] === lineLcs[k]) {
+                    // Removed line on left
+                    rows1.push({ type: 'removed', text: lines1[i] });
+                    rows2.push({ type: 'pad', text: '' });
+                    removed++;
+                    i++;
+                } else if (i < lines1.length && j < lines2.length) {
+                    // Modified line — do word-level diff
+                    const wd = wordDiff(lines1[i], lines2[j]);
+                    rows1.push({ type: 'modified', html: wd.left });
+                    rows2.push({ type: 'modified', html: wd.right });
+                    added += wd.added;
+                    removed += wd.removed;
+                    i++; j++;
+                } else if (i < lines1.length) {
+                    rows1.push({ type: 'removed', text: lines1[i] });
+                    rows2.push({ type: 'pad', text: '' });
+                    removed++;
+                    i++;
+                } else if (j < lines2.length) {
+                    rows1.push({ type: 'pad', text: '' });
+                    rows2.push({ type: 'added', text: lines2[j] });
+                    added++;
+                    j++;
+                }
+            }
+            
+            // Render aligned rows
+            let html1 = '', html2 = '';
+            for (let r = 0; r < rows1.length; r++) {
+                const r1 = rows1[r], r2 = rows2[r];
+                html1 += renderRow(r1, 'left');
+                html2 += renderRow(r2, 'right');
+            }
+            
+            document.getElementById('result1').innerHTML = html1 || '<span class="unchanged">(empty)</span>';
+            document.getElementById('result2').innerHTML = html2 || '<span class="unchanged">(empty)</span>';
+            document.getElementById('stats').innerHTML = 
+                `<span class="remove-count">−${removed} removed</span>` +
+                `<span class="add-count">+${added} added</span>`;
+        }
+        
+        function renderRow(row, side) {
+            if (row.type === 'pad') {
+                return '<div class="diff-line pad">&nbsp;</div>';
+            } else if (row.type === 'unchanged') {
+                return `<div class="diff-line">${escapeHtml(row.text) || '&nbsp;'}</div>`;
+            } else if (row.type === 'removed') {
+                return `<div class="diff-line removed-line">${escapeHtml(row.text) || '&nbsp;'}</div>`;
+            } else if (row.type === 'added') {
+                return `<div class="diff-line added-line">${escapeHtml(row.text) || '&nbsp;'}</div>`;
+            } else if (row.type === 'modified') {
+                return `<div class="diff-line modified-line">${row.html || '&nbsp;'}</div>`;
+            }
+            return '';
+        }
+        
+        function wordDiff(line1, line2) {
+            const words1 = line1.split(/(\s+)/);
+            const words2 = line2.split(/(\s+)/);
             const lcs = longestCommonSubsequence(words1, words2);
             
-            let result1 = '';
-            let result2 = '';
+            let left = '', right = '';
             let i = 0, j = 0, k = 0;
             let added = 0, removed = 0;
             
             while (i < words1.length || j < words2.length) {
                 if (k < lcs.length && i < words1.length && words1[i] === lcs[k]) {
                     if (j < words2.length && words2[j] === lcs[k]) {
-                        result1 += escapeHtml(words1[i]);
-                        result2 += escapeHtml(words2[j]);
+                        left += escapeHtml(words1[i]);
+                        right += escapeHtml(words2[j]);
                         i++; j++; k++;
                     } else {
-                        result2 += `<span class="added">${escapeHtml(words2[j])}</span>`;
+                        right += `<span class="added">${escapeHtml(words2[j])}</span>`;
                         if (words2[j].trim()) added++;
                         j++;
                     }
-                } else if (i < words1.length) {
-                    result1 += `<span class="removed">${escapeHtml(words1[i])}</span>`;
+                } else if (i < words1.length && !(k < lcs.length && j < words2.length && words2[j] === lcs[k])) {
+                    left += `<span class="removed">${escapeHtml(words1[i])}</span>`;
                     if (words1[i].trim()) removed++;
                     i++;
-                } else if (j < words2.length) {
-                    result2 += `<span class="added">${escapeHtml(words2[j])}</span>`;
+                } else if (i < words1.length) {
+                    left += `<span class="removed">${escapeHtml(words1[i])}</span>`;
+                    if (words1[i].trim()) removed++;
+                    i++;
+                } else {
+                    right += `<span class="added">${escapeHtml(words2[j])}</span>`;
                     if (words2[j].trim()) added++;
                     j++;
                 }
             }
-            
-            document.getElementById('result1').innerHTML = result1 || '<span class="unchanged">(empty)</span>';
-            document.getElementById('result2').innerHTML = result2 || '<span class="unchanged">(empty)</span>';
-            document.getElementById('stats').innerHTML = 
-                `<span class="remove-count">−${removed} removed</span>` +
-                `<span class="add-count">+${added} added</span>`;
+            return { left, right, added, removed };
         }
         
         function longestCommonSubsequence(arr1, arr2) {
