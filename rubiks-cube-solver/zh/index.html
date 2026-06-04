@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RB92YJ3CLH"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-RB92YJ3CLH');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="免费在线三阶魔方求解器。支持点击贴纸录入未复原魔方，或粘贴面片字符串，然后获得逐步文字说明和动画演示。">
+    <meta name="keywords" content="魔方求解器,三阶魔方,在线魔方,魔方动画,魔方公式,面片字符串">
+    <meta name="author" content="Small Web Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://imxj.github.io/apps/rubiks-cube-solver/zh/" />
+    <meta property="og:title" content="三阶魔方求解器 - 逐步动画复原" />
+    <meta property="og:description" content="录入任意打乱的三阶魔方，直接在浏览器里求解，并逐步播放每一个动作。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://imxj.github.io/apps/rubiks-cube-solver/zh/" />
+    <meta property="og:site_name" content="Small Web Tools" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="三阶魔方求解器 - 逐步动画复原" />
+    <meta name="twitter:description" content="支持点击贴纸录入，自动求解三阶魔方，并提供完整复原动画和单步动作预览。" />
+    <link rel="icon" href="../../favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../../favicon.ico" type="image/x-icon">
+    <title>三阶魔方求解器 - 在线逐步动画复原工具 | 小工具合集</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "三阶魔方求解器",
+        "description": "免费在线三阶魔方求解工具，支持逐步说明和动画复原。",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "url": "https://imxj.github.io/apps/rubiks-cube-solver/zh/",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script>
+        window.CUBE_TOOL_LOCALE = "zh";
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/cubejs@1.3.2/lib/cube.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cubejs@1.3.2/lib/solve.min.js"></script>
+    <script type="module" src="https://cdn.cubing.net/v0/js/cubing/twisty"></script>
+    <script src="../app.js"></script>
+</body>
+
+</html>
