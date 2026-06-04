@@ -239,12 +239,6 @@
     <!-- PLAY MODE -->
     <div id="playControls" class="hide">
       <div class="card">
-        <h2>Instruction</h2>
-        <div id="instr"></div>
-        <div id="progress"></div>
-      </div>
-
-      <div class="card" style="margin-top:16px">
         <h2>Controls</h2>
         <div class="row" style="justify-content:center">
           <button id="btnRestart" class="icon" title="Back to start">⏮</button>
@@ -262,6 +256,12 @@
       <div class="card" style="margin-top:16px">
         <h2>Solution (<span id="moveCount">0</span> moves)</h2>
         <div class="steps" id="steps"></div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Instruction</h2>
+        <div id="instr"></div>
+        <div id="progress"></div>
       </div>
 
       <div class="row" style="margin-top:4px">
@@ -289,7 +289,7 @@
     <div id="scanInstr" class="scan-instr"></div>
     <div class="row" style="justify-content:center; margin-top:10px">
       <button id="scanMirror" class="ghost" title="Flip if left/right looks reversed">🪞 Mirror</button>
-      <button id="scanCapture" class="good" style="min-width:150px">📸 Capture face</button>
+      <button id="scanCapture" class="good" style="min-width:150px">📸 Capture now</button>
       <button id="scanRetake" class="ghost">↺ Retake last</button>
     </div>
     <div id="scanDone" class="row" style="justify-content:center; margin-top:10px; display:none">
@@ -980,6 +980,10 @@ let scanIdx = 0;                 // which face in SCAN_ORDER
 let scanData = {};               // face -> [9 x [r,g,b]]
 let scanMirror = false;
 let lastGrid = null;             // last detected grid this frame
+let stableFrames = 0;            // consecutive frames a grid has been locked on
+let captureCooldown = 0;         // frames to wait after an auto-capture
+const AUTO_CAPTURE_FRAMES = 12;  // ~0.2s of steady lock before auto-capturing
+const CAPTURE_COOLDOWN_FRAMES = 45; // pause after a capture so the next face can be lined up
 const procCanvas = document.createElement('canvas');   // downscaled frame for CV
 const procCtx = procCanvas.getContext('2d', { willReadFrequently: true });
 
@@ -1015,6 +1019,7 @@ async function openScanner() {
   scanEl.video.srcObject = scanStream;
   await scanEl.video.play().catch(() => {});
   scanIdx = 0; scanData = {};
+  stableFrames = 0; captureCooldown = 0;
   scanEl.root.classList.add('show');
   buildFaceChips();
   updateScanUI();
@@ -1160,8 +1165,30 @@ function scanLoop() {
   try { grid = detectGrid(dims.PW, dims.PH); } catch (e) { grid = null; }
   lastGrid = grid;
   drawOverlay(grid, dims);
-  if (grid) { scanEl.badge.textContent = '✓ Locked on — tap Capture'; scanEl.badge.classList.add('ok'); }
-  else { scanEl.badge.textContent = 'Fill the box with one face, then Capture'; scanEl.badge.classList.remove('ok'); }
+
+  if (captureCooldown > 0) {
+    captureCooldown--;
+    stableFrames = 0;
+    scanEl.badge.textContent = '✓ Captured — line up the next face';
+    scanEl.badge.classList.add('ok');
+    return;
+  }
+
+  if (grid) {
+    stableFrames++;
+    scanEl.badge.classList.add('ok');
+    if (stableFrames >= AUTO_CAPTURE_FRAMES) {
+      captureFace();
+      stableFrames = 0;
+      captureCooldown = CAPTURE_COOLDOWN_FRAMES;
+    } else {
+      scanEl.badge.textContent = '✓ Locked on — hold steady…';
+    }
+  } else {
+    stableFrames = 0;
+    scanEl.badge.textContent = 'Fill the box with one face to auto-capture';
+    scanEl.badge.classList.remove('ok');
+  }
 }
 
 function drawOverlay(grid, dims) {
@@ -1226,6 +1253,7 @@ function captureFace() {
 }
 function retakeLast() {
   if (scanIdx === 0) return;
+  stableFrames = 0; captureCooldown = CAPTURE_COOLDOWN_FRAMES;
   scanIdx--;
   const face = SCAN_ORDER[scanIdx];
   delete scanData[face];
