@@ -17,16 +17,17 @@
     --danger: #ff6b6b;
   }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   html, body { margin: 0; height: 100%; }
   body {
     background: radial-gradient(1200px 700px at 20% -10%, #1a2030, var(--bg));
     color: var(--text);
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden;
   }
   header {
     padding: 14px 22px; border-bottom: 1px solid var(--line);
-    display: flex; align-items: baseline; gap: 14px; flex: 0 0 auto;
+    display: flex; align-items: baseline; gap: 6px 14px; flex: 0 0 auto; flex-wrap: wrap;
   }
   header h1 { font-size: 19px; margin: 0; letter-spacing: .3px; }
   header .sub { color: var(--muted); font-size: 13px; }
@@ -38,6 +39,13 @@
     color: var(--muted); font-size: 12px; background: rgba(0,0,0,.35);
     padding: 6px 12px; border-radius: 20px; pointer-events: none; white-space: nowrap;
   }
+  #btnView {
+    position: absolute; top: 14px; right: 14px; z-index: 5;
+    font-size: 12px; padding: 7px 12px; border-radius: 20px;
+    background: rgba(20,24,32,.7); border: 1px solid var(--line); color: var(--text);
+    backdrop-filter: blur(3px); cursor: pointer;
+  }
+  #btnView:hover { background: rgba(40,48,64,.85); }
   #panel {
     border-left: 1px solid var(--line); background: var(--panel);
     padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
@@ -84,6 +92,14 @@
 
   .status { font-size: 13px; color: var(--muted); min-height: 18px; }
   .status.err { color: var(--danger); }
+  .tally { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-variant-numeric: tabular-nums;
+         padding: 4px 8px; border-radius: 999px; background: #232b38; border: 1px solid var(--line); color: var(--muted); }
+  .tag.ok { color: var(--text); border-color: #2f6b4f; }
+  .tag i { width: 12px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.4); display: inline-block; }
+  .hintline { font-size: 12px; }
+  .hintline.ok { color: var(--accent2); }
+  .hintline.err { color: var(--danger); }
 
   /* instruction */
   #instr { font-size: 16px; line-height: 1.4; }
@@ -120,6 +136,64 @@
              border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 14px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .ov-box { text-align: center; background: var(--panel); padding: 26px 34px; border-radius: 14px; border: 1px solid var(--line); }
+
+  /* ===== Camera scanner ===== */
+  #scanner {
+    position: fixed; inset: 0; z-index: 60; background: #06080c;
+    display: none; flex-direction: column;
+  }
+  #scanner.show { display: flex; }
+  .scan-head { display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--line); flex: 0 0 auto; }
+  .scan-head #scanTitle { font-weight: 600; }
+  .scan-stage { position: relative; flex: 1 1 auto; min-height: 0; background: #000; overflow: hidden; }
+  #scanVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #scanOverlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #scanBadge { position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.6); color: #fff; font-size: 13px; padding: 6px 14px; border-radius: 20px; }
+  #scanBadge.ok { background: rgba(45,212,167,.85); color: #062018; font-weight: 600; }
+  .scan-foot { flex: 0 0 auto; padding: 12px 16px 18px; border-top: 1px solid var(--line); background: var(--panel); }
+  .scan-faces { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .scan-faces .fc {
+    width: 54px; border-radius: 8px; border: 2px solid var(--line); overflow: hidden;
+    display: grid; grid-template-columns: repeat(3,1fr); aspect-ratio: 1; background: #111;
+  }
+  .scan-faces .fc.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,157,255,.4); }
+  .scan-faces .fc.filled { border-color: var(--accent2); }
+  .scan-faces .fc i { display: block; }
+  .scan-faces .fc .lbl { grid-column: 1/4; text-align: center; font-size: 10px; color: var(--muted); }
+  .scan-instr { text-align: center; margin-top: 12px; font-size: 15px; line-height: 1.4; }
+  .scan-instr b { color: var(--accent); }
+  .scan-instr .cubeface { font-weight: 700; }
+
+  /* ===== Mobile / narrow screens / any touch device =====
+     Touch devices (pointer: coarse) always stack, regardless of reported width,
+     so large phones, landscape phones, foldables and tablets still show the cube. */
+  @media (max-width: 1024px), (pointer: coarse) {
+    body { height: auto; min-height: 100vh; min-height: 100dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    header { padding: 12px 16px; }
+    header h1 { font-size: 17px; }
+    main { display: flex; flex-direction: column; }
+    #viewport { height: 46vh; height: 46dvh; min-height: 300px; flex: 0 0 auto; }
+    #panel {
+      border-left: none; border-top: 1px solid var(--line);
+      padding: 14px; overflow: visible; gap: 14px;
+    }
+    /* bigger tap targets */
+    .swatch { width: 42px; height: 42px; }
+    button { padding: 11px 14px; }
+    button.icon { padding: 11px 14px; font-size: 18px; }
+    .step { padding: 8px 11px; font-size: 14px; min-width: 40px; }
+    .steps { max-height: 200px; }
+    #instr { font-size: 15px; }
+  }
+  /* Avoid sticky :hover scaling staying "stuck" on touch devices */
+  @media (hover: none) {
+    .swatch:hover { transform: none; }
+    .cell.sticker:hover { transform: none; outline: none; }
+    button:hover { background: #2b3342; }
+    .step:hover { background: #232b38; }
+  }
 </style>
 </head>
 <body class="edit">
@@ -130,19 +204,24 @@
 
 <main>
   <div id="viewport">
-    <div id="hint">Drag to rotate · scroll to zoom</div>
+    <button id="btnView" title="Reset to default view">⟲ Reset view</button>
+    <div id="hint">Tap a sticker to paint · drag to rotate · right-click to copy a color</div>
   </div>
 
   <aside id="panel">
     <!-- EDIT MODE -->
     <div id="editControls">
       <div class="card">
-        <h2>1 · Pick a color, then click stickers</h2>
+        <h2>1 · Pick a color</h2>
         <div class="palette" id="palette"></div>
+        <div class="hintline" style="margin-top:9px">Then tap stickers <b>directly on the 3D cube</b> (drag to rotate it) — or on the map below.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
-        <h2>2 · Your cube (unfolded)</h2>
+        <h2>2 · Your cube (unfolded map)</h2>
+        <div class="row" style="margin-bottom:12px">
+          <button id="btnScan" class="primary" style="width:100%; justify-content:center">📷 Scan cube with camera</button>
+        </div>
         <div class="net" id="net"></div>
         <div class="status" id="editStatus" style="margin-top:10px"></div>
       </div>
@@ -174,8 +253,9 @@
           <button id="btnNext" class="icon" title="Next">▶</button>
         </div>
         <div class="speedrow" style="margin-top:14px">
-          <span>Speed</span>
-          <input type="range" id="speed" min="120" max="900" value="420" step="20" />
+          <span>Slow</span>
+          <input type="range" id="speed" min="1" max="10" value="7" step="1" />
+          <span>Fast</span>
         </div>
       </div>
 
@@ -192,6 +272,31 @@
 </main>
 
 <div id="overlay"><div class="ov-box"><div class="spinner"></div><div id="ovText">Preparing solver…</div></div></div>
+
+<!-- CAMERA SCANNER -->
+<div id="scanner">
+  <div class="scan-head">
+    <span id="scanTitle">Scan your cube</span>
+    <button id="scanClose" class="ghost">✕ Close</button>
+  </div>
+  <div class="scan-stage">
+    <video id="scanVideo" playsinline muted></video>
+    <canvas id="scanOverlay"></canvas>
+    <div id="scanBadge">Loading camera…</div>
+  </div>
+  <div class="scan-foot">
+    <div id="scanFaces" class="scan-faces"></div>
+    <div id="scanInstr" class="scan-instr"></div>
+    <div class="row" style="justify-content:center; margin-top:10px">
+      <button id="scanMirror" class="ghost" title="Flip if left/right looks reversed">🪞 Mirror</button>
+      <button id="scanCapture" class="good" style="min-width:150px">📸 Capture face</button>
+      <button id="scanRetake" class="ghost">↺ Retake last</button>
+    </div>
+    <div id="scanDone" class="row" style="justify-content:center; margin-top:10px; display:none">
+      <button id="scanApply" class="primary" style="min-width:200px">✓ Use these colors</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.137.5/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.137.5/examples/js/controls/OrbitControls.js"></script>
@@ -324,7 +429,9 @@ let animating = false;
 const viewport = document.getElementById('viewport');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-camera.position.set(4.2, 4.0, 5.4);
+const HOME_POS = new THREE.Vector3(4.2, 4.0, 5.4);
+const HOME_TARGET = new THREE.Vector3(0, 0, 0);
+camera.position.copy(HOME_POS);
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 viewport.appendChild(renderer.domElement);
@@ -332,6 +439,36 @@ const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.12;
 controls.minDistance = 4; controls.maxDistance = 14;
+
+// Smoothly orbit the camera back to the default view, like a human dragging the
+// cube around its centre: interpolate spherical angles (azimuth + tilt) + radius,
+// taking the shortest rotational path. Cartesian lerp would slide straight through
+// space and warp the zoom, which looks unnatural.
+let viewTween = null;
+function resetView() {
+  const startTarget = controls.target.clone();
+  const startSph = new THREE.Spherical().setFromVector3(camera.position.clone().sub(startTarget));
+  const homeSph = new THREE.Spherical().setFromVector3(HOME_POS.clone().sub(HOME_TARGET));
+  // shortest angular path for the horizontal (azimuth) angle
+  let dTheta = homeSph.theta - startSph.theta;
+  while (dTheta > Math.PI) dTheta -= 2 * Math.PI;
+  while (dTheta < -Math.PI) dTheta += 2 * Math.PI;
+  const t0 = performance.now(), dur = 1050;
+  const sph = new THREE.Spherical(), off = new THREE.Vector3(), tgt = new THREE.Vector3();
+  viewTween = (now) => {
+    const t = Math.min(1, (now - t0) / dur);
+    const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // easeInOutCubic
+    sph.radius = startSph.radius + (homeSph.radius - startSph.radius) * e;
+    sph.phi = startSph.phi + (homeSph.phi - startSph.phi) * e;
+    sph.theta = startSph.theta + dTheta * e;
+    sph.makeSafe();
+    off.setFromSpherical(sph);
+    tgt.lerpVectors(startTarget, HOME_TARGET, e);
+    controls.target.copy(tgt);
+    camera.position.copy(tgt).add(off);
+    if (t >= 1) viewTween = null;
+  };
+}
 
 const SPACING = 1.0, BODY = 0.94, STICKER = 0.84;
 const DIRS = [
@@ -367,6 +504,7 @@ const stickerGeo = new THREE.PlaneGeometry(STICKER, STICKER);
       const pm = new THREE.Mesh(stickerGeo, mat);
       orientPlane(pm, d.n);
       pm.visible = false;
+      pm.userData = { gi: groups.length, dir: d.key }; // gi = index this group will get
       g.add(pm);
       g.planes[d.key] = pm;
     }
@@ -401,8 +539,63 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 
+/* ---------- Paint directly on the 3D cube (raycasting) ---------- */
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+let hovered = null;
+function isEdit() { return document.body.classList.contains('edit'); }
+function pickSticker(clientX, clientY) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  ndc.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  ndc.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(ndc, camera);
+  const meshes = [];
+  for (const g of groups) for (const k in g.planes) { const p = g.planes[k]; if (p.visible) meshes.push(p); }
+  const hits = raycaster.intersectObjects(meshes, false);
+  return hits.length ? hits[0].object : null;
+}
+function stickerFromMesh(m) {
+  const cu = model[m.userData.gi];
+  const s = cu.stickers.find(s => dirKey(s.n) === m.userData.dir);
+  return { cu, s };
+}
+function setHover(m) {
+  if (hovered === m) return;
+  if (hovered) hovered.scale.set(1, 1, 1);
+  hovered = m;
+  if (hovered) hovered.scale.set(1.08, 1.08, 1.08);
+}
+
+let downX = 0, downY = 0, dragging = false;
+const canvas = renderer.domElement;
+canvas.addEventListener('pointerdown', e => { downX = e.clientX; downY = e.clientY; dragging = false; });
+canvas.addEventListener('pointermove', e => {
+  if ((e.clientX - downX) ** 2 + (e.clientY - downY) ** 2 > 36) dragging = true;
+  if (!isEdit() || e.pointerType === 'touch') return; // hover only for mouse, edit mode
+  const m = pickSticker(e.clientX, e.clientY);
+  setHover(m && m.userData && model[m.userData.gi].stickers.length > 1 ? m : null);
+  canvas.style.cursor = hovered ? 'pointer' : 'default';
+});
+canvas.addEventListener('pointerleave', () => setHover(null));
+canvas.addEventListener('pointerup', e => {
+  if (!isEdit() || dragging) return;          // a drag = camera rotate, not a paint
+  const m = pickSticker(e.clientX, e.clientY);
+  if (!m) return;
+  const { cu, s } = stickerFromMesh(m);
+  setSticker(cu, s, selColor);
+});
+canvas.addEventListener('contextmenu', e => {  // right-click = eyedropper
+  if (!isEdit()) return;
+  e.preventDefault();
+  const m = pickSticker(e.clientX, e.clientY);
+  if (!m) return;
+  const { cu, s } = stickerFromMesh(m);
+  setSticker(cu, s, null, true);
+});
+
 function loop() {
   requestAnimationFrame(loop);
+  if (viewTween) viewTween(performance.now());
   controls.update();
   renderer.render(scene, camera);
 }
@@ -490,24 +683,38 @@ function onPaint(face, idx) {
   const slot = SLOTS[FACE_ORDER[face] * 9 + idx];
   const cu = model.find(c => posKey(c.pos) === posKey(slot.pos));
   const s = cu.stickers.find(s => s.n[0] === slot.n[0] && s.n[1] === slot.n[1] && s.n[2] === slot.n[2]);
-  s.color = selColor;
-  renderNet(); resyncCube();
-  validateEdit();
+  setSticker(cu, s, selColor);
+}
+// Shared paint op (used by both the net and 3D cube). Centers are locked.
+function setSticker(cu, sticker, color, eyedrop) {
+  if (!cu || !sticker) return;
+  if (cu.stickers.length === 1) return; // center sticker, locked
+  if (eyedrop) { selColor = sticker.color; syncPalette(); return; }
+  sticker.color = color;
+  renderNet(); resyncCube(); validateEdit();
+}
+// Set a cell's color letter directly (used by the camera scanner). Skips centers.
+function setCellLetter(face, idx, letter) {
+  if (idx === 4) return;
+  const slot = SLOTS[FACE_ORDER[face] * 9 + idx];
+  const cu = model.find(c => posKey(c.pos) === posKey(slot.pos));
+  const s = cu.stickers.find(s => s.n[0] === slot.n[0] && s.n[1] === slot.n[1] && s.n[2] === slot.n[2]);
+  if (s) s.color = letter;
 }
 
 /* palette */
 const paletteEl = document.getElementById('palette');
+function syncPalette() {
+  [...paletteEl.children].forEach(c => c.classList.toggle('sel', c.dataset.letter === selColor));
+}
 function buildPalette() {
   for (const letter of ['U', 'R', 'F', 'D', 'L', 'B']) {
     const sw = document.createElement('div');
     sw.className = 'swatch' + (letter === selColor ? ' sel' : '');
     sw.style.background = COLOR_CSS[letter];
     sw.title = COLOR_NAME[letter];
-    sw.addEventListener('click', () => {
-      selColor = letter;
-      [...paletteEl.children].forEach(c => c.classList.remove('sel'));
-      sw.classList.add('sel');
-    });
+    sw.dataset.letter = letter;
+    sw.addEventListener('click', () => { selColor = letter; syncPalette(); });
     paletteEl.appendChild(sw);
   }
 }
@@ -521,18 +728,25 @@ function colorCounts() {
   for (const ch of f) c[ch] = (c[ch] || 0) + 1;
   return c;
 }
-function validateEdit() {
+// Live, non-blocking tally. Painting is NEVER prevented; this only shows progress.
+// `strict` (used on Solve) returns whether the layout is a valid 9-each cube.
+function validateEdit(strict) {
   const c = colorCounts();
-  const bad = [];
-  for (const l of ['U', 'R', 'F', 'D', 'L', 'B']) if ((c[l] || 0) !== 9) bad.push(`${COLOR_NAME[l]}: ${c[l] || 0}`);
-  if (bad.length) {
-    editStatus.className = 'status err';
-    editStatus.textContent = 'Each color needs exactly 9 stickers — ' + bad.join(', ');
-    return false;
+  let allNine = true;
+  let html = '<div class="tally">';
+  for (const l of ['U', 'R', 'F', 'D', 'L', 'B']) {
+    const n = c[l] || 0;
+    if (n !== 9) allNine = false;
+    html += `<span class="tag${n === 9 ? ' ok' : ''}" title="${COLOR_NAME[l]}">` +
+            `<i style="background:${COLOR_CSS[l]}"></i>${n}/9</span>`;
   }
+  html += '</div>';
   editStatus.className = 'status';
-  editStatus.textContent = 'Color counts look good. Ready to solve.';
-  return true;
+  editStatus.innerHTML = html +
+    (allNine ? '<div class="hintline ok">✓ Looks like a complete cube — ready to solve.</div>'
+             : (strict ? '<div class="hintline err">Each color needs exactly 9 stickers before solving.</div>'
+                       : '<div class="hintline">Paint freely. Each color needs 9 stickers to solve.</div>'));
+  return allNine;
 }
 
 /* =====================================================================
@@ -557,7 +771,7 @@ function ensureSolver() {
 }
 
 async function doSolve() {
-  if (!validateEdit()) return;
+  if (!validateEdit(true)) return;
   const facelets = getFacelets(model);
   if (facelets === SOLVED_STR) {
     editStatus.className = 'status';
@@ -590,6 +804,8 @@ function enterPlayMode() {
   document.getElementById('playControls').classList.remove('hide');
   document.getElementById('hint').textContent = 'Drag to rotate · scroll to zoom';
   document.getElementById('moveCount').textContent = solution.length;
+  setHover(null);
+  resetView();   // orbit back to the default angle as the solve begins
   buildSteps();
   restart();
 }
@@ -599,9 +815,11 @@ function enterEditMode() {
   document.body.classList.add('edit');
   document.getElementById('playControls').classList.add('hide');
   document.getElementById('editControls').classList.remove('hide');
+  document.getElementById('hint').textContent = 'Tap a sticker to paint · drag to rotate · right-click to copy a color';
   // restore the cube the user had set up
   model = buildFromFacelets(startFacelets);
   resyncCube(); renderNet(); validateEdit();
+  setHover(null);
 }
 
 const stepsEl = document.getElementById('steps');
@@ -655,7 +873,10 @@ function restart() { pausePlay(); setToStep(0); }
 function jumpTo(i) { pausePlay(); setToStep(Math.max(0, Math.min(solution.length, i))); }
 
 const speedEl = document.getElementById('speed');
-function moveDuration() { return Number(speedEl.value); }
+// Slider 1 (slow) .. 10 (fast), evenly spaced. Per-move quarter-turn duration in ms.
+// level 1 => 3000ms (very slow, study each turn), level 10 => 300ms (snappy).
+function moveDuration() { return Math.round(3000 - (Number(speedEl.value) - 1) * 300); }
+function moveGap() { return Math.max(30, Math.min(180, moveDuration() * 0.12)); }
 
 async function stepNext() {
   if (animating || stepIndex >= solution.length) return false;
@@ -681,7 +902,7 @@ async function play() {
   while (playing && stepIndex < solution.length) {
     const ok = await stepNext();
     if (!ok) break;
-    await new Promise(r => setTimeout(r, 90));
+    await new Promise(r => setTimeout(r, moveGap()));
   }
   playing = false; setPlayBtn();
 }
@@ -718,6 +939,350 @@ document.getElementById('btnNext').addEventListener('click', stepNext);
 document.getElementById('btnPrev').addEventListener('click', stepPrev);
 document.getElementById('btnRestart').addEventListener('click', restart);
 document.getElementById('btnEdit').addEventListener('click', enterEditMode);
+document.getElementById('btnView').addEventListener('click', resetView);
+
+/* =====================================================================
+   CAMERA SCANNER  (OpenCV.js auto-detects the 3x3 sticker grid)
+   ---------------------------------------------------------------------
+   Protocol: hold the cube in ONE fixed orientation (white Up, green Front)
+   and present each face squarely to the camera in the guided order. With
+   white kept on top, every face maps 1:1 onto the unfolded map (row,col).
+   The 6 captured face-centers act as a per-session color calibration:
+   each sticker is classified to the nearest center color (in CIELAB),
+   which is robust to lighting / white-balance. Anything slightly off can
+   be fixed with tap-to-paint afterwards.
+   ===================================================================== */
+const SCAN_ORDER = ['U', 'F', 'R', 'B', 'L', 'D'];
+const SCAN_GUIDE = {
+  U: 'Tilt the cube so the <b>TOP</b> face (above green) points at the camera. Keep green toward the floor.',
+  F: 'Show the <b>FRONT</b> face (green center) squarely. White stays on top.',
+  R: 'Turn the cube left so the <b>RIGHT</b> face (red center) faces the camera. White on top.',
+  B: 'Keep turning left to the <b>BACK</b> face (blue center). White on top.',
+  L: 'One more left turn to the <b>LEFT</b> face (orange center). White on top.',
+  D: 'Tilt so the <b>BOTTOM</b> face (below green) points at the camera. Green toward the ceiling.',
+};
+const scanEl = {
+  root: document.getElementById('scanner'),
+  video: document.getElementById('scanVideo'),
+  overlay: document.getElementById('scanOverlay'),
+  badge: document.getElementById('scanBadge'),
+  faces: document.getElementById('scanFaces'),
+  instr: document.getElementById('scanInstr'),
+  capture: document.getElementById('scanCapture'),
+  retake: document.getElementById('scanRetake'),
+  mirror: document.getElementById('scanMirror'),
+  done: document.getElementById('scanDone'),
+  apply: document.getElementById('scanApply'),
+  close: document.getElementById('scanClose'),
+};
+let cvReady = false, scanStream = null, scanRAF = 0;
+let scanIdx = 0;                 // which face in SCAN_ORDER
+let scanData = {};               // face -> [9 x [r,g,b]]
+let scanMirror = false;
+let lastGrid = null;             // last detected grid this frame
+const procCanvas = document.createElement('canvas');   // downscaled frame for CV
+const procCtx = procCanvas.getContext('2d', { willReadFrequently: true });
+
+function loadOpenCV() {
+  return new Promise((resolve, reject) => {
+    if (window.cv && cv.Mat) { cvReady = true; return resolve(); }
+    showOverlay('Loading vision engine (OpenCV ~10MB, one-time)…');
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@techstark/opencv-js@4.10.0-release.1/dist/opencv.js';
+    s.async = true;
+    s.onload = () => {
+      const ready = () => { cvReady = true; hideOverlay(); resolve(); };
+      if (window.cv && cv.Mat) ready();
+      else cv['onRuntimeInitialized'] = ready;
+    };
+    s.onerror = () => { hideOverlay(); reject(new Error('Failed to load OpenCV')); };
+    document.head.appendChild(s);
+  });
+}
+
+async function openScanner() {
+  try { await loadOpenCV(); }
+  catch (e) { alert('Could not load the vision engine. Check your connection and try again.'); return; }
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false,
+    });
+  } catch (e) {
+    alert('Camera access was denied or unavailable. You can still paint the cube by hand.');
+    return;
+  }
+  scanEl.video.srcObject = scanStream;
+  await scanEl.video.play().catch(() => {});
+  scanIdx = 0; scanData = {};
+  scanEl.root.classList.add('show');
+  buildFaceChips();
+  updateScanUI();
+  scanLoop();
+}
+
+function closeScanner() {
+  cancelAnimationFrame(scanRAF); scanRAF = 0;
+  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  scanEl.root.classList.remove('show');
+}
+
+function buildFaceChips() {
+  scanEl.faces.innerHTML = '';
+  SCAN_ORDER.forEach((f, i) => {
+    const fc = document.createElement('div');
+    fc.className = 'fc'; fc.dataset.face = f;
+    fc.innerHTML = '<span class="lbl">' + FACE_NAME[f] + '</span>' +
+      Array.from({ length: 9 }, () => '<i style="background:#1a1f29"></i>').join('');
+    scanEl.faces.appendChild(fc);
+  });
+}
+function paintFaceChip(face, colors) {
+  const fc = scanEl.faces.querySelector(`.fc[data-face="${face}"]`);
+  if (!fc) return;
+  fc.classList.add('filled');
+  const cells = fc.querySelectorAll('i');
+  colors.forEach((rgb, k) => { cells[k].style.background = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`; });
+}
+function updateScanUI() {
+  const done = scanIdx >= SCAN_ORDER.length;
+  scanEl.faces.querySelectorAll('.fc').forEach(fc => fc.classList.remove('active'));
+  if (!done) {
+    const face = SCAN_ORDER[scanIdx];
+    scanEl.faces.querySelector(`.fc[data-face="${face}"]`).classList.add('active');
+    scanEl.instr.innerHTML = `<span class="cubeface">Face ${scanIdx + 1} of 6.</span> ` + SCAN_GUIDE[face];
+    scanEl.capture.style.display = '';
+    scanEl.done.style.display = 'none';
+  } else {
+    scanEl.instr.innerHTML = 'All six faces captured! Review the strip, then apply.';
+    scanEl.capture.style.display = 'none';
+    scanEl.done.style.display = '';
+  }
+  scanEl.retake.style.display = scanIdx > 0 ? '' : 'none';
+}
+
+// Fixed 3x3 alignment guide, in normalized [0..1] frame fractions.
+// Sampling and the on-screen box both use these fractions, so they always line up
+// regardless of video aspect/zoom. The guide is what makes capture ALWAYS work.
+const GUIDE = { half: 0.30 };           // box spans 0.20..0.80 of the frame
+const GUIDE_FRACS = [0.30, 0.50, 0.70]; // cell-center fractions along each axis
+
+// Draw the current camera frame into procCanvas, cropped to match object-fit:cover
+// (so proc fractions == what the user sees). Returns {PW,PH} or null.
+function drawProc() {
+  const v = scanEl.video;
+  if (!v.videoWidth) return null;
+  const dispW = v.clientWidth || 480, dispH = v.clientHeight || 360;
+  const aspect = dispW / dispH;
+  const vw = v.videoWidth, vh = v.videoHeight;
+  // cover crop of the source matching the display aspect
+  let sw, sh;
+  if (vw / vh > aspect) { sh = vh; sw = Math.round(vh * aspect); } else { sw = vw; sh = Math.round(vw / aspect); }
+  const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+  const PW = 480, PH = Math.round(480 / aspect);
+  procCanvas.width = PW; procCanvas.height = PH;
+  procCtx.save();
+  if (scanMirror) { procCtx.translate(PW, 0); procCtx.scale(-1, 1); }
+  procCtx.drawImage(v, sx, sy, sw, sh, 0, 0, PW, PH);
+  procCtx.restore();
+  return { PW, PH };
+}
+
+/* ---- OpenCV detection (optional assist): find a 3x3 grid in the frame ---- */
+function detectGrid(PW, PH) {
+  let src = cv.imread(procCanvas);
+  let gray = new cv.Mat(), edges = new cv.Mat();
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+  cv.GaussianBlur(gray, gray, new cv.Size(5, 5), 0);
+  cv.Canny(gray, edges, 35, 90);
+  let k = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
+  cv.dilate(edges, edges, k);
+  let contours = new cv.MatVector(), hier = new cv.Mat();
+  cv.findContours(edges, contours, hier, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+
+  const frameArea = PW * PH, cands = [];
+  for (let i = 0; i < contours.size(); i++) {
+    const c = contours.get(i);
+    const peri = cv.arcLength(c, true);
+    let ap = new cv.Mat();
+    cv.approxPolyDP(c, ap, 0.045 * peri, true);
+    const area = cv.contourArea(ap);
+    if (ap.rows === 4 && cv.isContourConvex(ap) && area > frameArea * 0.0008 && area < frameArea * 0.09) {
+      const r = cv.boundingRect(ap);
+      const ar = r.width / r.height;
+      if (ar > 0.7 && ar < 1.45) cands.push({ cx: r.x + r.width / 2, cy: r.y + r.height / 2, size: (r.width + r.height) / 2 });
+    }
+    ap.delete(); c.delete();
+  }
+  src.delete(); gray.delete(); edges.delete(); k.delete(); contours.delete(); hier.delete();
+
+  const uniq = [];
+  for (const cd of cands) {
+    if (!uniq.some(u => Math.hypot(u.cx - cd.cx, u.cy - cd.cy) < cd.size * 0.5)) uniq.push(cd);
+  }
+  if (uniq.length < 9) return null;
+  const sizes = uniq.map(u => u.size).sort((a, b) => a - b);
+  const medSize = sizes[sizes.length >> 1];
+  const good = uniq.filter(u => u.size > medSize * 0.55 && u.size < medSize * 1.8);
+  if (good.length < 9) return null;
+  const xs = good.map(g => g.cx), ys = good.map(g => g.cy);
+  const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
+  const spanx = maxx - minx, spany = maxy - miny;
+  if (spanx < medSize * 1.2 || spany < medSize * 1.2) return null;
+  const cells = [];
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+    const ex = minx + spanx * (c / 2), ey = miny + spany * (r / 2);
+    let best = null, bd = Infinity;
+    for (const g of good) { const d = Math.hypot(g.cx - ex, g.cy - ey); if (d < bd) { bd = d; best = g; } }
+    if (!best || bd > medSize * 0.9) return null;
+    cells.push({ cx: best.cx, cy: best.cy, size: best.size });
+  }
+  return { cells, PW, PH };
+}
+
+// average color of a small patch at proc coords
+function patchColor(cx, cy, half) {
+  const x = Math.max(0, Math.round(cx - half)), y = Math.max(0, Math.round(cy - half));
+  const w = Math.min(procCanvas.width - x, Math.round(half * 2)), h = Math.min(procCanvas.height - y, Math.round(half * 2));
+  if (w <= 0 || h <= 0) return [0, 0, 0];
+  const d = procCtx.getImageData(x, y, w, h).data;
+  let r = 0, g = 0, b = 0, n = 0;
+  for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+  return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
+}
+
+function scanLoop() {
+  scanRAF = requestAnimationFrame(scanLoop);
+  if (scanIdx >= SCAN_ORDER.length) { drawOverlay(null); return; }
+  const dims = drawProc();
+  if (!dims) { return; }
+  let grid = null;
+  try { grid = detectGrid(dims.PW, dims.PH); } catch (e) { grid = null; }
+  lastGrid = grid;
+  drawOverlay(grid, dims);
+  if (grid) { scanEl.badge.textContent = '✓ Locked on — tap Capture'; scanEl.badge.classList.add('ok'); }
+  else { scanEl.badge.textContent = 'Fill the box with one face, then Capture'; scanEl.badge.classList.remove('ok'); }
+}
+
+function drawOverlay(grid, dims) {
+  const ov = scanEl.overlay, v = scanEl.video;
+  const W = v.clientWidth || ov.width, H = v.clientHeight || ov.height;
+  ov.width = W; ov.height = H;
+  const ctx = ov.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  if (grid && dims) {
+    // detected grid (green) — map proc fractions to display
+    const sx = W / dims.PW, sy = H / dims.PH;
+    ctx.lineWidth = 3; ctx.strokeStyle = '#2dd4a7'; ctx.fillStyle = 'rgba(45,212,167,.14)';
+    for (const c of grid.cells) {
+      const x = c.cx * sx, y = c.cy * sy, s = c.size * Math.min(sx, sy) * 0.9;
+      ctx.fillRect(x - s / 2, y - s / 2, s, s);
+      ctx.strokeRect(x - s / 2, y - s / 2, s, s);
+    }
+    return;
+  }
+  // fixed alignment box (white) with 3x3 guide lines + sample dots
+  const box = Math.min(W, H) * (GUIDE.half * 2);
+  const x0 = (W - box) / 2, y0 = (H - box) / 2;
+  ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,.85)';
+  ctx.strokeRect(x0, y0, box, box);
+  ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.35)';
+  for (let i = 1; i < 3; i++) {
+    ctx.beginPath(); ctx.moveTo(x0 + box * i / 3, y0); ctx.lineTo(x0 + box * i / 3, y0 + box); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, y0 + box * i / 3); ctx.lineTo(x0 + box, y0 + box * i / 3); ctx.stroke();
+  }
+  // sample dots at the guide cell centers
+  ctx.fillStyle = 'rgba(255,255,255,.6)';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+    const ccx = x0 + (c + 0.5) * box / 3, ccy = y0 + (r + 0.5) * box / 3;
+    ctx.beginPath(); ctx.arc(ccx, ccy, 3, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function captureFace() {
+  if (scanIdx >= SCAN_ORDER.length) return;
+  const dims = drawProc();
+  if (!dims) { scanEl.badge.textContent = 'Camera not ready yet…'; return; }
+  const face = SCAN_ORDER[scanIdx];
+  let colors;
+  if (lastGrid) {
+    // use the auto-detected grid
+    colors = lastGrid.cells.map(c => patchColor(c.cx, c.cy, Math.max(3, c.size * 0.22)));
+  } else {
+    // fall back to the fixed guide box — always works
+    const box = Math.min(dims.PW, dims.PH) * (GUIDE.half * 2);
+    const x0 = (dims.PW - box) / 2, y0 = (dims.PH - box) / 2;
+    colors = [];
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+      const cx = x0 + (c + 0.5) * box / 3, cy = y0 + (r + 0.5) * box / 3;
+      colors.push(patchColor(cx, cy, box / 9));
+    }
+  }
+  scanData[face] = colors;
+  paintFaceChip(face, colors);
+  scanIdx++;
+  updateScanUI();
+}
+function retakeLast() {
+  if (scanIdx === 0) return;
+  scanIdx--;
+  const face = SCAN_ORDER[scanIdx];
+  delete scanData[face];
+  const fc = scanEl.faces.querySelector(`.fc[data-face="${face}"]`);
+  fc.classList.remove('filled');
+  fc.querySelectorAll('i').forEach(i => i.style.background = '#1a1f29');
+  updateScanUI();
+}
+
+/* ---- color classification (nearest captured center, in CIELAB) ---- */
+function rgb2lab(rgb) {
+  let [r, g, b] = rgb.map(v => v / 255);
+  const f = (u) => (u > 0.04045 ? Math.pow((u + 0.055) / 1.055, 2.4) : u / 12.92);
+  r = f(r); g = f(g); b = f(b);
+  let x = (r * 0.4124 + g * 0.3576 + b * 0.1805) / 0.95047;
+  let y = (r * 0.2126 + g * 0.7152 + b * 0.0722) / 1.0;
+  let z = (r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883;
+  const t = (u) => (u > 0.008856 ? Math.cbrt(u) : 7.787 * u + 16 / 116);
+  x = t(x); y = t(y); z = t(z);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+function labDist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); }
+
+function applyScan() {
+  // references = each captured face's center, in Lab
+  const refs = {};
+  for (const face of SCAN_ORDER) {
+    if (!scanData[face]) continue;
+    refs[face] = rgb2lab(scanData[face][4]);
+  }
+  const refFaces = Object.keys(refs);
+  if (refFaces.length < 6) { alert('Please capture all six faces first.'); return; }
+  // classify every sticker -> nearest reference face -> that face's letter
+  for (const face of SCAN_ORDER) {
+    const cols = scanData[face];
+    for (let idx = 0; idx < 9; idx++) {
+      if (idx === 4) continue; // center stays canonical / locked
+      const lab = rgb2lab(cols[idx]);
+      let bestFace = refFaces[0], bd = Infinity;
+      for (const rf of refFaces) { const d = labDist(lab, refs[rf]); if (d < bd) { bd = d; bestFace = rf; } }
+      setCellLetter(face, idx, bestFace);
+    }
+  }
+  closeScanner();
+  renderNet(); resyncCube(); validateEdit();
+  editStatus.scrollIntoView({ block: 'nearest' });
+}
+
+document.getElementById('btnScan').addEventListener('click', openScanner);
+scanEl.close.addEventListener('click', closeScanner);
+scanEl.capture.addEventListener('click', captureFace);
+scanEl.retake.addEventListener('click', retakeLast);
+scanEl.apply.addEventListener('click', applyScan);
+scanEl.mirror.addEventListener('click', () => {
+  scanMirror = !scanMirror;
+  scanEl.video.style.transform = scanMirror ? 'scaleX(-1)' : 'none';
+});
 
 /* INIT */
 buildPalette();
