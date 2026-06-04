@@ -286,8 +286,7 @@
     <div id="scanFaces" class="scan-faces"></div>
     <div id="scanInstr" class="scan-instr"></div>
     <div class="row" style="justify-content:center; margin-top:10px">
-      <button id="scanMirror" class="ghost" title="Flip if left/right looks reversed">🪞 Mirror</button>
-      <button id="scanCapture" class="good" style="min-width:150px">📸 Capture face</button>
+      <button id="scanCapture" class="good" style="min-width:150px">📸 Capture now</button>
       <button id="scanRetake" class="ghost">↺ Retake last</button>
     </div>
     <div id="scanDone" class="row" style="justify-content:center; margin-top:10px; display:none">
@@ -968,7 +967,6 @@ const scanEl = {
   instr: document.getElementById('scanInstr'),
   capture: document.getElementById('scanCapture'),
   retake: document.getElementById('scanRetake'),
-  mirror: document.getElementById('scanMirror'),
   done: document.getElementById('scanDone'),
   apply: document.getElementById('scanApply'),
   close: document.getElementById('scanClose'),
@@ -978,6 +976,9 @@ let scanIdx = 0;                 // which face in SCAN_ORDER
 let scanData = {};               // face -> [9 x [r,g,b]]
 let scanMirror = false;
 let lastGrid = null;             // last detected grid this frame
+let frozen = false;              // showing a captured still, awaiting Use it / Retake
+let stableFrames = 0;            // consecutive frames a grid has stayed locked on
+const AUTO_CAPTURE_FRAMES = 10;  // steady lock (~0.17s) before auto-capturing
 const procCanvas = document.createElement('canvas');   // downscaled frame for CV
 const procCtx = procCanvas.getContext('2d', { willReadFrequently: true });
 
@@ -1013,6 +1014,7 @@ async function openScanner() {
   scanEl.video.srcObject = scanStream;
   await scanEl.video.play().catch(() => {});
   scanIdx = 0; scanData = {};
+  frozen = false; stableFrames = 0;
   scanEl.root.classList.add('show');
   buildFaceChips();
   updateScanUI();
@@ -1021,6 +1023,7 @@ async function openScanner() {
 
 function closeScanner() {
   cancelAnimationFrame(scanRAF); scanRAF = 0;
+  frozen = false; stableFrames = 0;
   if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
   scanEl.root.classList.remove('show');
 }
@@ -1045,18 +1048,32 @@ function paintFaceChip(face, colors) {
 function updateScanUI() {
   const done = scanIdx >= SCAN_ORDER.length;
   scanEl.faces.querySelectorAll('.fc').forEach(fc => fc.classList.remove('active'));
-  if (!done) {
-    const face = SCAN_ORDER[scanIdx];
-    scanEl.faces.querySelector(`.fc[data-face="${face}"]`).classList.add('active');
-    scanEl.instr.innerHTML = `<span class="cubeface">Face ${scanIdx + 1} of 6.</span> ` + SCAN_GUIDE[face];
-    scanEl.capture.style.display = '';
-    scanEl.done.style.display = 'none';
-  } else {
+  if (done) {
     scanEl.instr.innerHTML = 'All six faces captured! Review the strip, then apply.';
     scanEl.capture.style.display = 'none';
+    scanEl.retake.style.display = scanIdx > 0 ? '' : 'none';
+    scanEl.retake.textContent = '↺ Retake last';
     scanEl.done.style.display = '';
+    return;
   }
-  scanEl.retake.style.display = scanIdx > 0 ? '' : 'none';
+  scanEl.done.style.display = 'none';
+  const face = SCAN_ORDER[scanIdx];
+  scanEl.faces.querySelector(`.fc[data-face="${face}"]`).classList.add('active');
+  if (frozen) {
+    scanEl.instr.innerHTML = `<span class="cubeface">Face ${scanIdx + 1} of 6.</span> Captured — tap <b>Use it</b> to keep, or <b>Retake</b> to re-scan.`;
+    scanEl.capture.style.display = '';
+    scanEl.capture.textContent = '✓ Use it';
+    scanEl.capture.classList.remove('good'); scanEl.capture.classList.add('primary');
+    scanEl.retake.style.display = '';
+    scanEl.retake.textContent = '↺ Retake';
+  } else {
+    scanEl.instr.innerHTML = `<span class="cubeface">Face ${scanIdx + 1} of 6.</span> ` + SCAN_GUIDE[face];
+    scanEl.capture.style.display = '';
+    scanEl.capture.textContent = '📸 Capture now';
+    scanEl.capture.classList.remove('primary'); scanEl.capture.classList.add('good');
+    scanEl.retake.style.display = scanIdx > 0 ? '' : 'none';
+    scanEl.retake.textContent = '↺ Retake last';
+  }
 }
 
 // Fixed 3x3 alignment guide, in normalized [0..1] frame fractions.
@@ -1151,6 +1168,7 @@ function patchColor(cx, cy, half) {
 
 function scanLoop() {
   scanRAF = requestAnimationFrame(scanLoop);
+  if (frozen) return;                                  // holding a still — wait for Use it / Retake
   if (scanIdx >= SCAN_ORDER.length) { drawOverlay(null); return; }
   const dims = drawProc();
   if (!dims) { return; }
@@ -1158,8 +1176,16 @@ function scanLoop() {
   try { grid = detectGrid(dims.PW, dims.PH); } catch (e) { grid = null; }
   lastGrid = grid;
   drawOverlay(grid, dims);
-  if (grid) { scanEl.badge.textContent = '✓ Locked on — tap Capture'; scanEl.badge.classList.add('ok'); }
-  else { scanEl.badge.textContent = 'Fill the box with one face, then Capture'; scanEl.badge.classList.remove('ok'); }
+  if (grid) {
+    stableFrames++;
+    scanEl.badge.classList.add('ok');
+    if (stableFrames >= AUTO_CAPTURE_FRAMES) { captureFace(); }   // freezes the frame
+    else { scanEl.badge.textContent = '✓ Locked on — hold steady…'; }
+  } else {
+    stableFrames = 0;
+    scanEl.badge.textContent = 'Fill the box with one face';
+    scanEl.badge.classList.remove('ok');
+  }
 }
 
 function drawOverlay(grid, dims) {
@@ -1198,8 +1224,9 @@ function drawOverlay(grid, dims) {
   }
 }
 
+// Sample the current frame, store it tentatively, and freeze the still for confirmation.
 function captureFace() {
-  if (scanIdx >= SCAN_ORDER.length) return;
+  if (frozen || scanIdx >= SCAN_ORDER.length) return;
   const dims = drawProc();
   if (!dims) { scanEl.badge.textContent = 'Camera not ready yet…'; return; }
   const face = SCAN_ORDER[scanIdx];
@@ -1219,7 +1246,33 @@ function captureFace() {
   }
   scanData[face] = colors;
   paintFaceChip(face, colors);
+  // freeze the frame (overlay still shows the grid that was used) and wait for confirmation
+  frozen = true;
+  stableFrames = 0;
+  scanEl.video.pause();
+  scanEl.badge.textContent = '📸 Captured — Use it, or Retake';
+  scanEl.badge.classList.add('ok');
+  updateScanUI();
+}
+// Accept the frozen capture and move on to the next face.
+function useCapture() {
+  if (!frozen) return;
+  frozen = false;
+  stableFrames = 0;
   scanIdx++;
+  scanEl.video.play().catch(() => {});
+  updateScanUI();
+}
+// Discard the frozen capture and re-scan the same face.
+function retakeCurrent() {
+  if (!frozen) return;
+  const face = SCAN_ORDER[scanIdx];
+  delete scanData[face];
+  const fc = scanEl.faces.querySelector(`.fc[data-face="${face}"]`);
+  if (fc) { fc.classList.remove('filled'); fc.querySelectorAll('i').forEach(i => i.style.background = '#1a1f29'); }
+  frozen = false;
+  stableFrames = 0;
+  scanEl.video.play().catch(() => {});
   updateScanUI();
 }
 function retakeLast() {
@@ -1274,13 +1327,9 @@ function applyScan() {
 
 document.getElementById('btnScan').addEventListener('click', openScanner);
 scanEl.close.addEventListener('click', closeScanner);
-scanEl.capture.addEventListener('click', captureFace);
-scanEl.retake.addEventListener('click', retakeLast);
+scanEl.capture.addEventListener('click', () => frozen ? useCapture() : captureFace());
+scanEl.retake.addEventListener('click', () => frozen ? retakeCurrent() : retakeLast());
 scanEl.apply.addEventListener('click', applyScan);
-scanEl.mirror.addEventListener('click', () => {
-  scanMirror = !scanMirror;
-  scanEl.video.style.transform = scanMirror ? 'scaleX(-1)' : 'none';
-});
 
 /* INIT */
 buildPalette();
